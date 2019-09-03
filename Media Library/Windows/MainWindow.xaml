@@ -1,0 +1,220 @@
+﻿<Window x:Class="Media_Library.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:tk="clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Input.Toolkit"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+        xmlns:local="clr-namespace:Media_Library"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        Height="600" Width="800"
+        MinHeight="600" MinWidth="800">
+
+    <Window.Resources>
+        <ResourceDictionary Source="..\Styles\TextBlock.xaml"/>
+    </Window.Resources>
+    
+    <Grid>
+        
+        <Border Grid.Row="0" Margin="5">
+            <TabControl SelectedIndex="1">
+                <TabItem HorizontalAlignment="Right">
+                    <TabItem.Header>
+                        <Grid Width="25">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto">
+                                <Image Width="25" Height="25" Source="..\Resources\Gear_64.png"/>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <Grid DataContext="{Binding SettingsViewModel}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="250"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Margin="12,2" VerticalAlignment="Center" Text="Scan for video files." Style="{StaticResource Header}"/>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="75"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Margin="2" Text="{Binding FolderToScan.Value}"/>
+                                <Button Grid.Column="2" Margin="2" Command="{Binding ScanFolderForVideoFiles}">
+                                    <TextBlock Text="Scan" Style="{StaticResource Default}"/>
+                                </Button>
+                            </Grid>
+                            <DataGrid Grid.Row="2" AutoGenerateColumns="False" ItemsSource="{Binding MissingVideoFiles}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Path" Width="*" Binding="{Binding Path}"/>
+                                    <DataGridTextColumn Header="Directory" Width="*" Binding="{Binding Directory}"/>
+                                    <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Size" Width="125" Binding="{Binding Size}"/>
+                                    <DataGridTemplateColumn Header="Add" Width="50">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Command="{Binding AddVideoFile}">
+                                                    <TextBlock Text="Add"/>
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem.Content>
+                </TabItem>
+                
+                <TabItem>
+                    <TabItem.Header>
+                        <Grid Width="100">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto">
+                                <Ellipse Width="10" Height="10" Fill="Gray"/>
+                                <Label>First Tab</Label>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <Grid DataContext="{Binding VideoViewModel}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="125"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Margin="3" Width="24" Visibility="{Binding ClearButtonVisibility.Value}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush" Value="Gray"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Setter Property="CornerRadius" Value="5"/>
+                                            <Setter Property="Background" Value="LightGray"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="Gray"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Border.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick" Command="{Binding ClearFilters}"/>
+                                    </Border.InputBindings>
+                                    <Polygon Width="10" Height="10" Stretch="Fill" Fill="White">
+                                        <Polygon.Points>
+                                            <Point X="3" Y="5"/>
+                                            <Point X="5" Y="3"/>
+                                            <Point X="10" Y="8"/>
+                                            <Point X="15" Y="3"/>
+                                            <Point X="17" Y="5"/>
+                                            <Point X="12" Y="10"/>
+                                            <Point X="17" Y="15"/>
+                                            <Point X="15" Y="17"/>
+                                            <Point X="10" Y="12"/>
+                                            <Point X="5" Y="17"/>
+                                            <Point X="3" Y="15"/>
+                                            <Point X="8" Y="10"/>
+                                        </Polygon.Points>
+                                    </Polygon>
+                                </Border>
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding FilterEntities}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Margin="3" BorderBrush="Gray" CornerRadius="5" BorderThickness="1" Background="{Binding Background}">
+                                                <TextBlock Margin="3" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Text}" Foreground="White"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <tk:AutoCompleteBox x:Name="VideoTabAutoComplete" Grid.Column="2" Margin="3" FontFamily="Segoe UI" Foreground="Gray" FilterMode="Contains" 
+                                                    ItemsSource="{Binding VideoSearchEntities}"
+                                                    ValueMemberBinding="{Binding Text}"
+                                                    SelectedItem="{Binding SelectedSearchEntity.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding AutoCompleteText.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <tk:AutoCompleteBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Grid.Column="0" FontFamily="Segoe UI" FontWeight="SemiBold" Text="{Binding Text}" Foreground="{Binding FontColor}"/>
+                                        </DataTemplate>
+                                    </tk:AutoCompleteBox.ItemTemplate>
+                                    <tk:AutoCompleteBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding AddFilter}"/>
+                                    </tk:AutoCompleteBox.InputBindings>
+                                </tk:AutoCompleteBox>
+                                <ComboBox Grid.Column="3" Margin="3" ItemsSource="{Binding OrderingOptions}" SelectedItem="{Binding SelectedOrdering.Value}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="SelectionChanged">
+                                            <i:InvokeCommandAction Command="{Binding OrderingChanged}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ComboBox>
+                            </Grid>
+                            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding VideoSeriesEntitiesView}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Margin="3" Visibility="{Binding Visible.Value}" BorderThickness="1" BorderBrush="#B2B0B5">
+                                                <Image Width="200" Height="200" Source="{Binding Icon}">
+                                                    <Image.InputBindings>
+                                                        <MouseBinding MouseAction="LeftClick" Command="{Binding GetSeriesDetails}"/>
+                                                    </Image.InputBindings>
+                                                </Image>
+                                                <!--<TextBlock Width="200" Height="200" Background="White" TextWrapping="Wrap" Text="{Binding Name}"/>-->
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <Grid Width="100">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto">
+                                <Ellipse Width="10" Height="10" Fill="Orange"/>
+                                <Label>Second Tab</Label>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <Border>
+
+                        </Border>
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <Grid Width="100">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto">
+                                <Ellipse Width="10" Height="10" Fill="#DC775F"/>
+                                <Label>Third Tab</Label>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <Border>
+
+                        </Border>
+                    </TabItem.Content>
+                </TabItem>
+            </TabControl>
+        </Border>
+    </Grid>
+</Window>

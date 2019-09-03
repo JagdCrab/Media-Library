@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Media_Library.ViewModel;
+
 namespace Media_Library
 {
     /// <summary>
@@ -23,6 +25,7 @@ namespace Media_Library
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = new MainWindowViewModel();
         }
     }
 }
