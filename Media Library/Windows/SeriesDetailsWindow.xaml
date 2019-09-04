@@ -12,7 +12,7 @@
         MaxWidth="1920"
         MaxHeight="1080">
     <Grid>
-        <comp:FrameItemsControl ItemsSource="{Binding VideoDetailPages}">
+        <comp:FrameItemsControl ItemsSource="{Binding VideoDetailsPages}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal"/>

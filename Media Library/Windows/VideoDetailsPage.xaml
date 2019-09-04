@@ -3,12 +3,354 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:tk="clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Layout.Toolkit"
+      xmlns:itk="clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Input.Toolkit"
       xmlns:local="clr-namespace:Media_Library.Windows"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      Height="525" 
+      Width="275"
       Title="VideoDetailsPage">
 
-    <Grid>
-        
-    </Grid>
+    <Border Margin="4" BorderBrush="Gray" BorderThickness="1">
+        <Grid>
+            <Grid.Resources>
+                <ResourceDictionary Source="..\Styles\TextBlock.xaml"/>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="210"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="210"/>
+                    <ColumnDefinition Width="55"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Margin="5" Background="LightGray">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="AllowDrop" Value="False"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding EditMode.Value}" Value="True">
+                                    <Setter Property="AllowDrop" Value="True"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Image Source="{Binding Icon.Value}"/>
+                </Border>
+
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="55"/>
+                        <RowDefinition Height="55"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Margin="0,5,5,0">
+                        <Image Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality">
+                            <Image.Style>
+                                <Style TargetType="Image">
+                                    <Setter Property="Source" Value="..\Resources\FavOff.png"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Favorite.Value}" Value="True">
+                                            <Setter Property="Source" Value="..\Resources\FavOn.png"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                            <Image.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SwitchFavorite}"/>
+                            </Image.InputBindings>
+                        </Image>
+                    </Border>
+
+                    <Border Grid.Row="1" Margin="0,5,5,0" Background="LightGray"/>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Margin="0,5,5,5" Background="DarkGray"/>
+                        <Border Grid.Column="1" Margin="0,5,5,5" Background="DarkGray"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <Border Grid.Row="1" Margin="5" Background="White">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="20"/>
+                    </Grid.ColumnDefinitions>
+                </Grid>
+
+            </Border>
+            <Border Grid.Row="2" Margin="5">
+                <Border.Resources>
+                    <ResourceDictionary Source="..\Styles\Accordion.xaml" />
+                </Border.Resources>
+                <tk:Accordion HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <tk:AccordionItem HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsSelected="false">
+                        <tk:AccordionItem.Header>
+                            <TextBlock Margin="0,0,0,6" Text="Video Info" Style="{StaticResource Bold}"/>
+                        </tk:AccordionItem.Header>
+                        <tk:AccordionItem.Content>
+                            <ScrollViewer Height="140">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Separator Grid.Row="0"/>
+                                    <TextBlock Grid.Row="1" Margin="10,3" Text="Series" Style="{StaticResource Header}"/>
+                                    <Separator Grid.Row="2"/>
+                                    <Grid Grid.Row="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition>
+                                                <ColumnDefinition.Style>
+                                                    <Style TargetType="ColumnDefinition">
+                                                        <Setter Property="Width" Value="*"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding EditMode.Value}" Value="True">
+                                                                <Setter Property="Width" Value="0"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ColumnDefinition.Style>
+                                            </ColumnDefinition>
+                                            <ColumnDefinition>
+                                                <ColumnDefinition.Style>
+                                                    <Style TargetType="ColumnDefinition">
+                                                        <Setter Property="Width" Value="*"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding EditMode.Value}" Value="False">
+                                                                <Setter Property="Width" Value="0"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ColumnDefinition.Style>
+                                            </ColumnDefinition>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Alias:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Margin="3" Text="{Binding Alias.Value}"/>
+                                        <TextBox Grid.Row="0" Grid.Column="2" Margin="3" Text="{Binding Alias.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  BorderBrush="Gray"/>
+                                        <Image Grid.Row="0" Grid.Column="3" Visibility="{Binding AliasError.Value}"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Series:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Visibility="{Binding DetailsElementsVisibility.Value}" Margin="3" Text="{Binding Series.Value}"/>
+                                        <itk:AutoCompleteBox Grid.Row="1" Grid.Column="2" Margin="3" FontFamily="Segoe UI" Foreground="Gray" BorderBrush="Gray"
+                                                             FilterMode="Contains"
+                                                             ItemsSource="{Binding SeriesAutoCompleteEntities}"
+                                                             Text="{Binding Series.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                        </itk:AutoCompleteBox>
+                                        <Image Grid.Row="0" Grid.Column="3" Visibility="{Binding Series.Value}"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Alt Alias:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Margin="3" Text="{Binding Alt_Alias.Value}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="2" Margin="3" Text="{Binding Alt_Alias.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  BorderBrush="Gray"/>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Alt Series:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Margin="3" Text="{Binding Alt_Series.Value}"/>
+                                        <itk:AutoCompleteBox Grid.Row="3" Grid.Column="2" Margin="3" FontFamily="Segoe UI" Foreground="Gray" BorderBrush="Gray"
+                                                             FilterMode="Contains"
+                                                             ItemsSource="{Binding Alt_SeriesAutoCompleteEntities}"
+                                                             Text="{Binding Alt_Series.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                        </itk:AutoCompleteBox>
+                                    </Grid>
+                                    <Separator Grid.Row="4"/>
+                                    <Grid Grid.Row="5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Margin="10,3" Text="Metadata" Style="{StaticResource Header}"/>
+                                        <Button Grid.Column="1" Margin="3" Command="{Binding RefreshMetadata}">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding EditMode.Value}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                            <TextBlock Margin="3,0" Text="Update"/>
+                                        </Button>
+                                    </Grid>
+                                    <Separator Grid.Row="6"/>
+                                    <Grid Grid.Row="7">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Duration:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Margin="3" Text="{Binding Duration.Value}"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Bitrate:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Margin="3" Text="{Binding Bitrate.Value}"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Frame:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Margin="3" Text="{Binding Frame.Value}"/>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Format:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Margin="3" Text="{Binding Format.Value}"/>
+                                    </Grid>
+                                    <Separator Grid.Row="8"/>
+                                    <Grid Grid.Row="9">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Margin="10,3" Text="File Info" Style="{StaticResource Header}"/>
+                                        <Button Grid.Column="1" Margin="3" Command="{Binding RefreshFileInfo}">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding EditMode.Value}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                            <TextBlock Margin="3,0" Text="Update"/>
+                                        </Button>
+                                    </Grid>
+                                    <Separator Grid.Row="10"/>
+                                    <Grid Grid.Row="11">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="File Path:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Margin="3" Text="{Binding FilePath.Value}"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="File Name:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Margin="3" Text="{Binding FileName.Value}"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Extention:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Margin="3" Text="{Binding Extention.Value}"/>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="File Size:" TextAlignment="Right" Style="{StaticResource Bold}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Margin="3" Text="{Binding FileSize.Value}"/>                                        
+                                    </Grid>
+                                </Grid>
+                            </ScrollViewer>
+                        </tk:AccordionItem.Content>
+                    </tk:AccordionItem>
+                    <tk:AccordionItem HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsSelected="true">
+                        <tk:AccordionItem.Header>
+                            <TextBlock Margin="0,0,0,6" Text="Screenlist" Style="{StaticResource Bold}"/>
+                        </tk:AccordionItem.Header>
+                        <tk:AccordionItem.Content>
+                            <Grid Height="140">
+                                <Image Source="{Binding Screenlist.Value}"/>
+                                <Grid Height="100" Width="100" Visibility="{Binding LoadingIndicatorVisibility.Value}">
+                                    <Grid.Resources>
+                                        <ResourceDictionary Source="..\Styles\RadialProgressBar.xaml"/>
+                                    </Grid.Resources>
+                                    <Viewbox>
+                                        <ProgressBar Width="300" Height="300" Maximum="{Binding LoadingIndicatorMax.Value}" Value="{Binding LoadingIndicatorCurrent.Value}" Style="{StaticResource ProgressBarStyle}"/>
+                                    </Viewbox>
+                                </Grid>
+                            </Grid>
+                        </tk:AccordionItem.Content>
+                    </tk:AccordionItem>
+                </tk:Accordion>
+            </Border>
+            <Border Grid.Row="3" Margin="5">
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition>
+                            <ColumnDefinition.Style>
+                                <Style TargetType="ColumnDefinition">
+                                    <Setter Property="Width" Value="50"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding EditMode.Value}" Value="True">
+                                            <Setter Property="Width" Value="0"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ColumnDefinition.Style>
+                        </ColumnDefinition>
+                        <ColumnDefinition>
+                            <ColumnDefinition.Style>
+                                <Style TargetType="ColumnDefinition">
+                                    <Setter Property="Width" Value="50"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding EditMode.Value}" Value="False">
+                                            <Setter Property="Width" Value="0"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ColumnDefinition.Style>
+                        </ColumnDefinition>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="75"/>
+                        <ColumnDefinition Width="30"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Margin="3" Command="{Binding EnableEditMode}">
+                        <TextBlock Text="Edit"/>
+                    </Button>
+                    <Button Grid.Column="1" Margin="3" Command="{Binding SaveChanges}">
+                        <TextBlock Text="Save"/>
+                    </Button>
+
+                    <Button Grid.Column="3" Margin="3" Command="{Binding PlayNow}">
+                        <TextBlock Text="Play"/>
+                    </Button>
+                    <Button Grid.Column="4" Margin="3" Command="{Binding AddToPlaylist}">
+                        <TextBlock Text="+"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
 </Page>

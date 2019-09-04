@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 using Media_Library.Components;
 using Media_Library.Data;
+using Media_Library.Windows;
 
 namespace Media_Library.ViewModel
 {
@@ -123,7 +124,9 @@ namespace Media_Library.ViewModel
         public Observable<Visibility> Visible;
         public Command GetSeriesDetails { get {
                 return new Command(new Action(() => {
-
+                    var seriesDetailsWindow = new SeriesDetailsWindow(VideoSeries);
+                    seriesDetailsWindow.Show();
+                    seriesDetailsWindow.Activate();
                 }));
             }
         }

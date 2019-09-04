@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using Media_Library.Data;
+using Media_Library.ViewModel;
 
 namespace Media_Library.Windows
 {
@@ -25,6 +26,7 @@ namespace Media_Library.Windows
         public VideoDetailsPage(VideoRecord _videoRecord)
         {
             InitializeComponent();
+            this.DataContext = new VideoDetailsPageViewModel(_videoRecord);
         }
     }
 }
