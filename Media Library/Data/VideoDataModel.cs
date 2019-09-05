@@ -9,11 +9,6 @@ namespace Media_Library.Data
 
     public class VideoSeriesCollection : List<VideoSeries>
     {
-        new public VideoSeries this[int sid]
-        {
-            get { return this.Where(x => x.Sid == sid).First(); }
-        }
-
         public VideoSeries this[string series]
         {
             get { return this.Where(x => x.Series == series || x.Alt_Series == series).First(); }
@@ -30,8 +25,7 @@ namespace Media_Library.Data
         private VideoRecordCollection videoRecords;
         private VideoTagCollection videoTags;
         private SearchEntityCollection searchEntities;
-
-        public int? Sid { get; set; }
+        
         public string Series { get; set; }
         public string Alt_Series { get; set; }
         public BitmapSource Icon { get; set; }
@@ -106,13 +100,13 @@ namespace Media_Library.Data
         public long File_Size { get; set; }
         public string Alias { get; set; }
         public string Alt_Alias { get; set; }
-        public int? Sid { get; set; }
         public string Series { get; set; }
         public string Alt_Series { get; set; }
         public BitmapSource Icon { get; set; }
         public int Score { get; set; }
         public bool Favorite { get; set; }
         public TimeSpan Duration { get; set; }
+        public string Intensity { get; set; }
         public DateTime Last_playback { get; set; }
         public string Format { get; set; }
         public string Resolution { get; set; }
@@ -161,7 +155,6 @@ namespace Media_Library.Data
     public class VideoTag
     {
         public int? Id { get; set; }
-        public int? Sid { get; set; }
         public int? Vid { get; set; }
         public string Text { get; set; }
         public Intensity Intensity { get; set; }
@@ -187,7 +180,6 @@ namespace Media_Library.Data
     public class VideoScreenlist
     {
         public int? Id { get; set; }
-        public int? Sid { get; set; }
         public int? Vid { get; set; }
         public BitmapSource Screenlist { get; set; }
         public bool Deleted { get; set; }
@@ -204,6 +196,29 @@ namespace Media_Library.Data
             this.VideoRecord = _record;
         }
     }
+    #endregion
+
+    #region Playlist
+
+    public class VideoPlaylistCollection : List<VideoPlaylist>
+    {
+
+    }
+
+    public class VideoPlaylist
+    {
+        public int? Pid { get; set; }
+        public int Vid { get; set; }
+        public string Alias { get; set; }
+        public string Series { get; set; }
+        public DateTime Inserted { get; set; }
+
+        public VideoPlaylist()
+        {
+
+        }
+    }
+
     #endregion
 }
 

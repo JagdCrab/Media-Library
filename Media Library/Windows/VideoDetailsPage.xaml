@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:tk="clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Layout.Toolkit"
       xmlns:itk="clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Input.Toolkit"
+      xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
       xmlns:local="clr-namespace:Media_Library.Windows"
       mc:Ignorable="d" 
       Height="525" 
@@ -44,12 +45,34 @@
 
                 <Grid Grid.Column="2">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="55"/>
-                        <RowDefinition Height="55"/>
-                        <RowDefinition/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="15"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="5"/>
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0" Margin="0,5,5,0">
+                        <Image Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality">
+                            <Image.Style>
+                                <Style TargetType="Image">
+                                    <Setter Property="Source" Value="..\Resources\PlaylistOff.png"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Playlist.Value}" Value="True">
+                                            <Setter Property="Source" Value="..\Resources\PlaylistOn.png"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                            <Image.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SwitchPlaylist}"/>
+                            </Image.InputBindings>
+                        </Image>
+                    </Border>
+                    
+                    <Border Grid.Row="2" Margin="0,5,5,0">
                         <Image Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality">
                             <Image.Style>
                                 <Style TargetType="Image">
@@ -67,17 +90,64 @@
                         </Image>
                     </Border>
 
-                    <Border Grid.Row="1" Margin="0,5,5,0" Background="LightGray"/>
 
-                    <Grid Grid.Row="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Grid.Column="0" Margin="0,5,5,5" Background="DarkGray"/>
-                        <Border Grid.Column="1" Margin="0,5,5,5" Background="DarkGray"/>
+                    <Grid Grid.Row="3" Margin="0,5,5,0" DataContext="{Binding ScoreUI}">
+                        <Grid.Resources>
+                            <ResourceDictionary Source="..\Styles\ContextMenu.xaml"/>
+                        </Grid.Resources>
+                        <Border>
+                            <Border.ContextMenu>
+                                <ContextMenu IsEnabled="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext, diag:PresentationTraceSources.TraceLevel=High}" ItemsSource="{Binding PossibleStates}">
+                                    <ContextMenu.ItemContainerStyle>
+                                        <Style TargetType="{x:Type MenuItem}">
+                                            <Setter Property="Command" Value="{Binding ChangeState}"/>
+                                            <Setter Property="Template" Value="{DynamicResource {ComponentResourceKey ResourceId=SubmenuItemTemplateKey, TypeInTargetAssembly={x:Type MenuItem}}}"/>
+                                        </Style>
+                                    </ContextMenu.ItemContainerStyle>
+                                    <ContextMenu.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="25"/>
+                                                    <ColumnDefinition Width="25"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Border BorderThickness="0" CornerRadius="5 0 0 5" Background="{Binding Background.Value}" Grid.Column="0">
+                                                    <TextBlock Margin="5 1" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="{Binding Score.Value}"/>
+                                                </Border>
+                                                <Border BorderThickness="0" CornerRadius="0 5 5 0" Background="#7B7981" Grid.Column="1">
+                                                    <TextBlock Margin="5 1" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="10"/>
+                                                </Border>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ContextMenu.ItemTemplate>
+                                </ContextMenu>
+                            </Border.ContextMenu>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="25"/>
+                                    <ColumnDefinition Width="25"/>
+                                </Grid.ColumnDefinitions>
+                                <Border BorderThickness="0" CornerRadius="5 0 0 5" Background="{Binding Background.Value}" Grid.Column="0">
+                                    <TextBlock Margin="5 1" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="{Binding Score.Value}"/>
+                                </Border>
+                                <Border BorderThickness="0" CornerRadius="0 5 5 0" Background="#7B7981" Grid.Column="1">
+                                    <TextBlock Margin="5 1" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="10"/>
+                                </Border>
+                            </Grid>
+                        </Border>
                     </Grid>
+
+                    <!--<Border Grid.Row="3" Margin="0,5,5,0" Background="Gray" CornerRadius="5" DataContext="{Binding ScoreUI}">
+                        <TextBlock Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Score.Value}"/>
+                    </Border>-->
+                    
+                    <Border Grid.Row="4" Margin="0,5,5,0" Background="Gray" CornerRadius="5" DataContext="{Binding IntensityUI}">
+                        <TextBlock Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Score.Value}"/>
+                    </Border>
+                    
+                    <Border Grid.Row="5" Margin="0,5,5,0" Background="Gray" CornerRadius="5" DataContext="{Binding DurationUI}">
+                        <TextBlock Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Score.Value}"/>
+                    </Border>
                 </Grid>
             </Grid>
 
@@ -96,7 +166,7 @@
                     <ResourceDictionary Source="..\Styles\Accordion.xaml" />
                 </Border.Resources>
                 <tk:Accordion HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <tk:AccordionItem HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsSelected="false">
+                    <tk:AccordionItem HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsSelected="False">
                         <tk:AccordionItem.Header>
                             <TextBlock Margin="0,0,0,6" Text="Video Info" Style="{StaticResource Bold}"/>
                         </tk:AccordionItem.Header>
@@ -170,7 +240,7 @@
                                                              ItemsSource="{Binding SeriesAutoCompleteEntities}"
                                                              Text="{Binding Series.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                         </itk:AutoCompleteBox>
-                                        <Image Grid.Row="0" Grid.Column="3" Visibility="{Binding Series.Value}"/>
+                                        <Image Grid.Row="0" Grid.Column="3" Visibility="{Binding SeriesError.Value}"/>
 
                                         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Alt Alias:" TextAlignment="Right" Style="{StaticResource Bold}"/>
                                         <TextBlock Grid.Row="2" Grid.Column="1" Margin="3" Text="{Binding Alt_Alias.Value}"/>
@@ -180,7 +250,7 @@
                                         <TextBlock Grid.Row="3" Grid.Column="1" Margin="3" Text="{Binding Alt_Series.Value}"/>
                                         <itk:AutoCompleteBox Grid.Row="3" Grid.Column="2" Margin="3" FontFamily="Segoe UI" Foreground="Gray" BorderBrush="Gray"
                                                              FilterMode="Contains"
-                                                             ItemsSource="{Binding Alt_SeriesAutoCompleteEntities}"
+                                                             ItemsSource="{Binding AltSeriesAutoCompleteEntities}"
                                                              Text="{Binding Alt_Series.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                         </itk:AutoCompleteBox>
                                     </Grid>
@@ -322,7 +392,7 @@
                         <ColumnDefinition>
                             <ColumnDefinition.Style>
                                 <Style TargetType="ColumnDefinition">
-                                    <Setter Property="Width" Value="50"/>
+                                    <Setter Property="Width" Value="80"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding EditMode.Value}" Value="False">
                                             <Setter Property="Width" Value="0"/>
@@ -339,9 +409,20 @@
                     <Button Grid.Column="0" Margin="3" Command="{Binding EnableEditMode}">
                         <TextBlock Text="Edit"/>
                     </Button>
-                    <Button Grid.Column="1" Margin="3" Command="{Binding SaveChanges}">
-                        <TextBlock Text="Save"/>
-                    </Button>
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Button Grid.Column="0" Margin="3" Command="{Binding SaveChanges}">
+                            <TextBlock Text="Save"/>
+                        </Button>
+                        
+                        <Button Grid.Column="1" Margin="3" Command="{Binding RevertChanges}">
+                            <TextBlock Text="X"/>
+                        </Button>
+                    </Grid>
 
                     <Button Grid.Column="3" Margin="3" Command="{Binding PlayNow}">
                         <TextBlock Text="Play"/>

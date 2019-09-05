@@ -18,11 +18,16 @@ namespace Media_Library.ViewModel
         public Observable<Visibility> SeriesError { get; }
 
         public List<string> SeriesAutoCompleteEntities { get; }
-        public List<string> Alt_SeriesAutoCompleteEntities { get; }
+        public List<string> AltSeriesAutoCompleteEntities { get; }
 
         public Observable<BitmapSource> Icon { get; }
 
+        public Observable<bool> Playlist { get; }
         public Observable<bool> Favorite { get; }
+
+        public ScoreEntity ScoreUI { get; }
+        public IntensityEntity IntensityUI { get; }
+        public DurationEntity DurationUI { get; }
 
         public Observable<string> Alias { get; }
         public Observable<string> Series { get; }
@@ -45,6 +50,7 @@ namespace Media_Library.ViewModel
         public Observable<int> LoadingIndicatorMax { get; }
         public Observable<int> LoadingIndicatorCurrent { get; }
 
+        public Command SwitchPlaylist { get; }
         public Command SwitchFavorite { get; }
 
         public Command RefreshMetadata { get; }
@@ -52,14 +58,42 @@ namespace Media_Library.ViewModel
 
         public Command EnableEditMode { get; }
         public Command SaveChanges { get; }
+        public Command RevertChanges { get; }
         public Command PlayNow { get; }
         public Command AddToPlaylist { get; }
 
         public VideoDetailsPageViewModel(VideoRecord _record)
         {
             #region DataAttributes
+
+            SeriesAutoCompleteEntities = VideoAccesser.GetVideoSeriesAutoComplete();
+            AltSeriesAutoCompleteEntities = VideoAccesser.GetVideoAltSeriesAutoComplete();
+
             Icon = new Observable<BitmapSource>() { Value = _record.Icon };
+
+            Playlist = new Observable<bool>() { Value = VideoAccesser.CheckIfInPlaylist(_record) };
             Favorite = new Observable<bool>() { Value = _record.Favorite };
+
+            ScoreUI = new ScoreEntity(_record.Score);
+            IntensityUI = new IntensityEntity(_record.Intensity);
+            DurationUI = new DurationEntity(_record.Duration);
+
+            Alias = new Observable<string>() { Value = _record.Alias };
+            Series = new Observable<string>() { Value = _record.Series };
+            Alt_Alias = new Observable<string>() { Value = _record.Alt_Alias };
+            Alt_Series = new Observable<string>() { Value = _record.Alt_Series };
+
+            Duration = new Observable<string>() { Value = _record.Duration.ToString(@"mm\:ss") };
+            Bitrate = new Observable<string>() { Value = Math.Round(_record.File_Size / (double)_record.Duration.TotalSeconds).ToString() + "bps" };
+            Frame = new Observable<string>() { Value = _record.Resolution };
+            Format = new Observable<string>() { Value = _record.Format };
+
+            FilePath = new Observable<string>() { Value = _record.File_Path };
+            FileName = new Observable<string>() { Value = _record.File_Name };
+            Extention = new Observable<string>() { Value = _record.File_Extention };
+            FileSize = new Observable<string>() { Value = Math.Round(_record.File_Size / 1048576d, 1).ToString() + "MB" };
+
+            Screenlist = new Observable<BitmapSource>() { Value = _record.Screenlist.Screenlist };
 
             #endregion
 
@@ -70,6 +104,10 @@ namespace Media_Library.ViewModel
             #endregion
 
             #region Commands
+
+            SwitchPlaylist = new Command(new Action(() => {
+                Playlist.Value = !Playlist.Value;
+            }));
 
             SwitchFavorite = new Command(new Action(() => {
                 if (EditMode.Value)
@@ -82,6 +120,10 @@ namespace Media_Library.ViewModel
             }));
 
             SaveChanges = new Command(new Action(() => {
+                EditMode.Value = false;
+            }));
+
+            RevertChanges = new Command(new Action(() => {
                 EditMode.Value = false;
             }));
             #endregion

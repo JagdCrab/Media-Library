@@ -88,8 +88,8 @@ namespace Media_Library.Data
             {
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "Select distinct [Text] From [VideoTags] Where [Deleted] = 0 and [sid] = @sid;";
-                    command.Parameters.Add(new SQLiteParameter("@sid") { DbType = DbType.Int32, Value = _series.Sid });
+                    command.CommandText = @"Select distinct [Text] From [VideoTags] t1 Inner Join [VideoRecords] t2 on t1.[Vid] = t2.[Vid] Where t1.[Deleted] = 0 and t2.[Series] = @series;";
+                    command.Parameters.Add(new SQLiteParameter("@series") { DbType = DbType.String, Value = _series.Series });
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -101,8 +101,8 @@ namespace Media_Library.Data
 
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "Select distinct [Series] From [VideoRecords] Where [Deleted] = 0 and [sid] = @sid;";
-                    command.Parameters.Add(new SQLiteParameter("@sid") { DbType = DbType.Int32, Value = _series.Sid });
+                    command.CommandText = "Select distinct [Series] From [VideoRecords] Where [Deleted] = 0 and [Series] = @series;";
+                    command.Parameters.Add(new SQLiteParameter("@series") { DbType = DbType.String, Value = _series.Series });
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -114,8 +114,8 @@ namespace Media_Library.Data
 
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "Select distinct [Alt_Series] From [VideoRecords] Where [Deleted] = 0 and [sid] = @sid;";
-                    command.Parameters.Add(new SQLiteParameter("@sid") { DbType = DbType.Int32, Value = _series.Sid });
+                    command.CommandText = "Select distinct [Alt_Series] From [VideoRecords] Where [Deleted] = 0 and [Series] = @series;";
+                    command.Parameters.Add(new SQLiteParameter("@series") { DbType = DbType.String, Value = _series.Series });
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -129,6 +129,52 @@ namespace Media_Library.Data
             return entities;
         }
 
+        public static List<string> GetVideoSeriesAutoComplete()
+        {
+            var result = new List<string>();
+
+            using (var connection = CreateConnection())
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "Select distinct [Series] From [VideoRecords] Where [Deleted] = 0;";
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                            return result;
+
+                        while (reader.Read())
+                            result.Add(reader.GetString(0));
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public static List<string> GetVideoAltSeriesAutoComplete()
+        {
+            var result = new List<string>();
+
+            using (var connection = CreateConnection())
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "Select distinct [Alt_Series] From [VideoRecords] Where [Deleted] = 0;";
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                            return result;
+
+                        while (reader.Read())
+                            result.Add(reader.GetNullableString(0));
+                    }
+                }
+            }
+
+            return result;
+        }
+
         public static VideoSeriesCollection GetVideoSeries()
         {
             var collection = new VideoSeriesCollection();
@@ -138,11 +184,10 @@ namespace Media_Library.Data
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = @"
-                        Select [Sid], [Series], [Alt_Series], [Icon], [Inserted]
+                        Select [Series], [Alt_Series], [Icon], [Inserted]
                         From (
 	                        Select
-		                         Row_Number() Over (Partition by Sid Order by Random()) as n
-		                        ,[Sid]
+		                         Row_Number() Over (Partition by [Series] Order by Random()) as n
                                 ,[Series]
                                 ,[Alt_Series]
                                 ,[Icon]
@@ -160,12 +205,11 @@ namespace Media_Library.Data
                         while (reader.Read())
                         {
                             VideoSeries series = new VideoSeries();
-
-                            series.Sid = reader.GetInt32(0);
-                            series.Series = reader.GetString(1);
-                            series.Alt_Series = reader.GetNullableString(2);
-                            series.Icon = reader.GetBitmap(3);
-                            series.Inserted = reader.GetDateTime(4);
+                            
+                            series.Series = reader.GetString(0);
+                            series.Alt_Series = reader.GetNullableString(1);
+                            series.Icon = reader.GetBitmap(2);
+                            series.Inserted = reader.GetDateTime(3);
 
                             collection.Add(series);
                         }
@@ -184,8 +228,8 @@ namespace Media_Library.Data
             {
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "Select [Vid],[File_Path],[File_Name],[File_Extention],[File_Size],[Alias],[Alt_Alias],[Series],[Alt_Series],[Icon],[Score],[Favorite],[Duration],[Last_playback],[Format],[Resolution],[Checksum],[Inserted] From [VideoRecords] Where [Deleted] = 0 and [Sid] = @sid;";
-                    command.Parameters.Add(new SQLiteParameter("@sid") { DbType = DbType.Int32, Value = _series.Sid });
+                    command.CommandText = "Select [Vid],[File_Path],[File_Name],[File_Extention],[File_Size],[Alias],[Alt_Alias],[Series],[Alt_Series],[Icon],[Score],[Favorite],[Duration],[Intensity],[Last_playback],[Format],[Resolution],[Checksum],[Inserted] From [VideoRecords] Where [Deleted] = 0 and [Series] = @series;";
+                    command.Parameters.Add(new SQLiteParameter("@series") { DbType = DbType.String, Value = _series.Series });
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -209,11 +253,12 @@ namespace Media_Library.Data
                             record.Score = reader.GetInt32(10);
                             record.Favorite = reader.GetBoolean(11);
                             record.Duration = reader.GetTimeSpan(12);
-                            record.Last_playback = reader.GetDateTime(13);
-                            record.Format = reader.GetNullableString(14);
-                            record.Resolution = reader.GetNullableString(15);
-                            record.Checksum = reader.GetNullableString(16);
-                            record.Inserted = reader.GetDateTime(17);
+                            record.Intensity = reader.GetNullableString(13);
+                            record.Last_playback = reader.GetDateTime(14);
+                            record.Format = reader.GetNullableString(15);
+                            record.Resolution = reader.GetNullableString(16);
+                            record.Checksum = reader.GetNullableString(17);
+                            record.Inserted = reader.GetDateTime(18);
 
                             records.Add(record);
                         }
@@ -232,8 +277,8 @@ namespace Media_Library.Data
             {
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "Select [Id], [Sid], [Vid], [Text], [Intensity] From [VideoTags] Where [Deleted] = 0 and [Sid] = @sid;";
-                    command.Parameters.Add(new SQLiteParameter("@sid") { DbType = DbType.Int32, Value = _series.Sid });
+                    command.CommandText = "Select [Id], [Vid], [Text], [Intensity] From [VideoTags] Where [Deleted] = 0 and [Series] = @series;";
+                    command.Parameters.Add(new SQLiteParameter("@series") { DbType = DbType.String, Value = _series.Series });
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -245,10 +290,9 @@ namespace Media_Library.Data
                             VideoTag tag = new VideoTag(_series);
 
                             tag.Id = reader.GetInt32(0);
-                            tag.Sid = reader.GetInt32(1);
-                            tag.Vid = reader.GetInt32(2);
-                            tag.Text = reader.GetString(3);
-                            tag.Intensity = reader.GetIntensity(4);
+                            tag.Vid = reader.GetInt32(1);
+                            tag.Text = reader.GetString(2);
+                            tag.Intensity = reader.GetIntensity(3);
 
                             tags.Add(tag);
                         }
@@ -267,7 +311,7 @@ namespace Media_Library.Data
             {
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "Select [Id], [Sid], [Vid], [Text], [Intensity] From [VideoTags] Where [Deleted] = 0 and [Vid] = @vid;";
+                    command.CommandText = "Select [Id], [Vid], [Text], [Intensity] From [VideoTags] Where [Deleted] = 0 and [Vid] = @vid;";
                     command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int32, Value = _record.Vid });
 
                     using (var reader = command.ExecuteReader())
@@ -280,10 +324,9 @@ namespace Media_Library.Data
                             VideoTag tag = new VideoTag(_record);
 
                             tag.Id = reader.GetInt32(0);
-                            tag.Sid = reader.GetInt32(1);
-                            tag.Vid = reader.GetInt32(2);
-                            tag.Text = reader.GetString(3);
-                            tag.Intensity = reader.GetIntensity(4);
+                            tag.Vid = reader.GetInt32(1);
+                            tag.Text = reader.GetString(2);
+                            tag.Intensity = reader.GetIntensity(3);
 
                             tags.Add(tag);
                         }
@@ -302,7 +345,7 @@ namespace Media_Library.Data
             {
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "Select [Id], [Sid], [Vid], [Screenlist] From [VideoScreenlists] Where [Deleted] = 0 and [Vid] = @vid;";
+                    command.CommandText = "Select [Id], [Vid], [Screenlist] From [VideoScreenlists] Where [Deleted] = 0 and [Vid] = @vid;";
                     command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int32, Value = _record.Vid });
 
                     using (var reader = command.ExecuteReader())
@@ -313,14 +356,67 @@ namespace Media_Library.Data
                         {
                             reader.Read();
                             screenlist.Id = reader.GetInt32(0);
-                            screenlist.Sid = reader.GetInt32(1);
-                            screenlist.Vid = reader.GetInt32(2);
-                            screenlist.Screenlist = reader.GetBitmap(3);
+                            screenlist.Vid = reader.GetInt32(1);
+                            screenlist.Screenlist = reader.GetBitmap(2);
                         }
                     }
                 }
             }
             return screenlist;
+        }
+
+        public static VideoPlaylistCollection GetVideoPlaylist()
+        {
+            var result = new VideoPlaylistCollection();
+
+            using (var connection = CreateConnection())
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "Select [Pid], [Vid], [Alias], [Series], [Inserted] From [VideoPlaylist];";
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                            return result;
+
+                        while(reader.Read())
+                        {
+                            var record = new VideoPlaylist();
+
+                            record.Pid = reader.GetInt32(0);
+                            record.Vid = reader.GetInt32(1);
+                            record.Alias = reader.GetString(2);
+                            record.Series = reader.GetString(3);
+                            record.Inserted = reader.GetDateTime(4);
+
+                            result.Add(record);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public static bool CheckIfInPlaylist(VideoRecord _videoRecord)
+        {
+            using (var connection = CreateConnection())
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "Select [Pid] From [VideoPlaylist] Where [Vid] = @vid Limit 1;";
+                    command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int32, Value = _videoRecord.Vid });
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                            return true;
+                        else
+                            return false;
+                    }
+                }
+            }
         }
 
         #endregion
