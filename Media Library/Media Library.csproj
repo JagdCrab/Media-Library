@@ -86,16 +86,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Components\BindingProxy.cs" />
     <Compile Include="Components\Command.cs" />
     <Compile Include="Components\CRC.cs" />
+    <Compile Include="Components\FocusBehaviour.cs" />
     <Compile Include="Components\FrameItemsControl.cs" />
     <Compile Include="Components\Observable.cs" />
     <Compile Include="Components\RadialProgressBar.cs" />
+    <Compile Include="Components\ValueConverters.cs" />
     <Compile Include="Data\FileSystemAccesser.cs" />
     <Compile Include="ViewModel\EntitiesViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\SeriesDetailsWindowViewModel.cs" />
     <Compile Include="ViewModel\SettingsTabViewModel.cs" />
+    <Compile Include="ViewModel\TagViewModel.cs" />
     <Compile Include="ViewModel\VideoDetailsPageViewModel.cs" />
     <Compile Include="Windows\SeriesDetailsWindow.xaml.cs">
       <DependentUpon>SeriesDetailsWindow.xaml</DependentUpon>
@@ -112,6 +116,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles\RadialProgressBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Templates\TagTemplates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -172,9 +180,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Templates\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\FavOff.png" />
     <Resource Include="Resources\Gear.png" />
@@ -190,6 +196,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\PlaylistOn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\DropOff.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.111.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.111.0\build\net46\System.Data.SQLite.Core.targets')" />

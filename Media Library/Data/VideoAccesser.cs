@@ -175,6 +175,29 @@ namespace Media_Library.Data
             return result;
         }
 
+        public static List<string> GetVideoTagsAutoComplete()
+        {
+            var result = new List<string>();
+
+            using (var connection = CreateConnection())
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "Select distinct [Text] From [VideoTags] Where [Deleted] = 0;";
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                            return result;
+
+                        while (reader.Read())
+                            result.Add(reader.GetNullableString(0));
+                    }
+                }
+            }
+
+            return result;
+        }
+
         public static VideoSeriesCollection GetVideoSeries()
         {
             var collection = new VideoSeriesCollection();

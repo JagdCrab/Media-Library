@@ -29,6 +29,8 @@ namespace Media_Library.ViewModel
         public IntensityEntity IntensityUI { get; }
         public DurationEntity DurationUI { get; }
 
+        public TagPresenter VideoTags { get; }
+
         public Observable<string> Alias { get; }
         public Observable<string> Series { get; }
         public Observable<string> Alt_Alias { get; }
@@ -77,6 +79,11 @@ namespace Media_Library.ViewModel
             ScoreUI = new ScoreEntity(_record.Score);
             IntensityUI = new IntensityEntity(_record.Intensity);
             DurationUI = new DurationEntity(_record.Duration);
+
+            VideoTags = new TagPresenter();
+
+            foreach (var tag in _record.Tags)
+                VideoTags.Entities.Insert(VideoTags.Entities.Count - 1, new TagEntity(tag, VideoTags.Entities));
 
             Alias = new Observable<string>() { Value = _record.Alias };
             Series = new Observable<string>() { Value = _record.Series };
