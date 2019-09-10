@@ -64,7 +64,7 @@ namespace Media_Library.ViewModel
             Intensity = Intensity.Neutral;
 
             var bytes = BitConverter.GetBytes((int)Intensity);
-            Background.Value = new SolidColorBrush(Color.FromArgb(bytes[3], bytes[2], bytes[1], bytes[0]));
+            Background = new Observable<SolidColorBrush>() { Value = new SolidColorBrush(Color.FromArgb(bytes[3], bytes[2], bytes[1], bytes[0])) };
 
             RemoveTag = new Command(new Action(() => {
                 _parent.Remove(this);
@@ -106,6 +106,10 @@ namespace Media_Library.ViewModel
     {
         public Observable<string> Text { get; }
         public List<string> AutoCompleteCollection { get; }
+        
+        public Observable<bool> IsFocused { get; set; }
+
+        public Command TakeFocusByForce { get; }
 
         public Command Submit { get; }
         public Command Cancel { get; }
@@ -115,9 +119,13 @@ namespace Media_Library.ViewModel
             Text = new Observable<string>();
             AutoCompleteCollection = VideoAccesser.GetVideoTagsAutoComplete();
 
+            IsFocused = new Observable<bool>();
+
+            TakeFocusByForce = new Command(new Action(() => { IsFocused.Value = true; }));
+
             Submit = new Command(new Action(() => {
                 _collection.Remove(this);
-                _collection.Add(new TagEntity(Text.Value, _collection));
+                _collection.Insert(_collection.Count - 1, new TagEntity(Text.Value, _collection));
             }));
 
             Cancel = new Command(new Action(() => {
@@ -136,7 +144,7 @@ namespace Media_Library.ViewModel
         {
             Collection = _collection;
             AddNewTag = new Command(new Action(() => {
-                Collection.Insert(Collection.Count - 2, new NewTagEntity(_collection));
+                Collection.Insert(Collection.Count - 1, new NewTagEntity(_collection));
             }));
         }
     }

@@ -11,7 +11,7 @@
       xmlns:local="clr-namespace:Media_Library.Windows"
       xmlns:comp="clr-namespace:Media_Library.Components"
       mc:Ignorable="d" 
-      Height="525" 
+      Height="Auto" 
       Width="275"
       Title="VideoDetailsPage">
 
@@ -27,8 +27,8 @@
             </Grid.Resources>
             <Grid.RowDefinitions>
                 <RowDefinition Height="210"/>
-                <RowDefinition Height="50"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" MinHeight="50"/>
+                <RowDefinition Height="215"/>
                 <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
             <Grid>
@@ -184,184 +184,6 @@
                 </Grid>
             </Grid>
 
-            <!--<Border Grid.Row="1">
-                <WrapPanel>
-                    <Border>
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Margin" Value="5,2,0,2"/>
-                                <Setter Property="BorderThickness" Value="2"/>
-                                <Setter Property="BorderBrush" Value="Gray"/>
-                                <Setter Property="CornerRadius" Value="5"/>
-                                <Setter Property="Height" Value="20"/>
-                            </Style>
-                        </Border.Style>
-                        <itk:AutoCompleteBox Text="{Binding Text.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <itk:AutoCompleteBox.Style>
-                                <Style TargetType="itk:AutoCompleteBox">
-                                    <Setter Property="FilterMode" Value="Contains"/>
-                                    <Setter Property="BorderThickness" Value="1"/>
-                                    <Setter Property="BorderBrush" Value="Transparent"/>
-                                    <Setter Property="Margin" Value="3,0"/>
-                                    <Setter Property="Foreground" Value="#4E4F58"/>
-                                    <Setter Property="FontSize" Value="11"/>
-                                    <Setter Property="FontWeight" Value="DemiBold"/>
-                                </Style>
-                            </itk:AutoCompleteBox.Style>
-
-                        </itk:AutoCompleteBox>
-                    </Border>
-                    
-                    <Border Background="{Binding Background}">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Margin" Value="5,2,0,2"/>
-                                <Setter Property="BorderThickness" Value="2"/>
-                                <Setter Property="BorderBrush" Value="Gray"/>
-                                <Setter Property="CornerRadius" Value="5"/>
-                                <Setter Property="Height" Value="20"/>
-                            </Style>
-                        </Border.Style>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*" MinWidth="20"/>
-                            </Grid.ColumnDefinitions>
-                            <Border x:Name="RemoveButton" Grid.Column="0" Visibility="{Binding Data.Value, Source={StaticResource EditMode}, Converter={StaticResource VisibilityConverter}}">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Width" Value="20"/>
-                                        <Setter Property="Background" Value="LightGray"/>
-                                        <Setter Property="BorderBrush" Value="Gray"/>
-                                        <Setter Property="BorderThickness" Value="0,0,2,0"/>
-                                        <Setter Property="CornerRadius" Value="3,0,0,3"/>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="Gray"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                <Polygon>
-                                    <Polygon.Style>
-                                        <Style TargetType="Polygon">
-                                            <Setter Property="Width" Value="10"/>
-                                            <Setter Property="Height" Value="10"/>
-                                            <Setter Property="Stretch" Value="Fill"/>
-                                            <Setter Property="Fill" Value="Gray"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsMouseOver, ElementName=RemoveButton}" Value="True">
-                                                    <Setter Property="Fill" Value="White"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Polygon.Style>
-                                    <Polygon.Points>
-                                        <Point X="3" Y="5"/>
-                                        <Point X="5" Y="3"/>
-                                        <Point X="10" Y="8"/>
-                                        <Point X="15" Y="3"/>
-                                        <Point X="17" Y="5"/>
-                                        <Point X="12" Y="10"/>
-                                        <Point X="17" Y="15"/>
-                                        <Point X="15" Y="17"/>
-                                        <Point X="10" Y="12"/>
-                                        <Point X="5" Y="17"/>
-                                        <Point X="3" Y="15"/>
-                                        <Point X="8" Y="10"/>
-                                    </Polygon.Points>
-                                </Polygon>
-                            </Border>
-                            <Grid Grid.Column="1">
-                                <TextBlock Grid.Column="1" Text="{Binding Text.Value}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Margin" Value="3,0"/>
-                                            <Setter Property="Foreground" Value="#4E4F58"/>
-                                            <Setter Property="FontSize" Value="11"/>
-                                            <Setter Property="FontWeight" Value="DemiBold"/>
-                                            <Setter Property="TextAlignment" Value="Center"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <Popup>
-                                    <ItemsControl ItemsSource="{Binding PossibleIntensityStates}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Vertical"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding Description}"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </Popup>
-                            </Grid>
-                        </Grid>
-                    </Border>
-
-                    <Border x:Name="AddButton"  Visibility="{Binding Data.Value, Source={StaticResource EditMode}, Converter={StaticResource VisibilityConverter}}">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Margin" Value="2,2,0,2"/>
-                                <Setter Property="Width" Value="20"/>
-                                <Setter Property="CornerRadius" Value="5"/>
-                                <Setter Property="Background" Value="LightGray"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="Gray"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <Border>
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="5"/>
-                                    <Setter Property="BorderBrush" Value="Gray"/>
-                                    <Setter Property="BorderThickness" Value="2"/>
-                                </Style>
-                            </Border.Style>
-                            <Border.InputBindings>
-                                <MouseBinding MouseAction="LeftClick" Command="{Binding AddNewTag}"/>
-                            </Border.InputBindings>
-                            <Polygon>
-                                <Polygon.Style>
-                                    <Style TargetType="Polygon">
-                                        <Setter Property="Margin" Value="3"/>
-                                        <Setter Property="Width" Value="10"/>
-                                        <Setter Property="Height" Value="10"/>
-                                        <Setter Property="Stretch" Value="Uniform"/>
-                                        <Setter Property="Fill" Value="Gray"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsMouseOver, ElementName=AddButton}" Value="True">
-                                                <Setter Property="Fill" Value="White"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Polygon.Style>
-                                <Polygon.Points>
-                                    <Point X="8.5" Y="0"/>
-                                    <Point X="11.5" Y="0"/>
-                                    <Point X="11.5" Y="8.5"/>
-                                    <Point X="20" Y="8.5"/>
-                                    <Point X="20" Y="11.5"/>
-                                    <Point X="11.5" Y="11.5"/>
-                                    <Point X="11.5" Y="20"/>
-                                    <Point X="8.5" Y="20"/>
-                                    <Point X="8.5" Y="11.5"/>
-                                    <Point X="0" Y="11.5"/>
-                                    <Point X="0" Y="8.5"/>
-                                    <Point X="8.5" Y="8.5"/>
-                                </Polygon.Points>
-                            </Polygon>
-                        </Border>
-                    </Border>
-                </WrapPanel>
-            </Border>-->
-            
             <Border Grid.Row="1">
                 <Border.Resources>
                     <ResourceDictionary>
@@ -373,10 +195,10 @@
                                         <Setter Property="BorderThickness" Value="2"/>
                                         <Setter Property="BorderBrush" Value="Gray"/>
                                         <Setter Property="CornerRadius" Value="5"/>
-                                        <Setter Property="Height" Value="20"/>
+                                        <Setter Property="Height" Value="25"/>
                                     </Style>
                                 </Border.Style>
-                                <itk:AutoCompleteBox Text="{Binding Text.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <itk:AutoCompleteBox Text="{Binding Text.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding AutoCompleteCollection}" comp:FocusBehaviour.ForceFocus="{Binding IsFocused.Value}">
                                     <itk:AutoCompleteBox.Style>
                                         <Style TargetType="itk:AutoCompleteBox">
                                             <Setter Property="FilterMode" Value="Contains"/>
@@ -388,7 +210,15 @@
                                             <Setter Property="FontWeight" Value="DemiBold"/>
                                         </Style>
                                     </itk:AutoCompleteBox.Style>
-
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Loaded">
+                                            <i:InvokeCommandAction Command="{Binding TakeFocusByForce}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    <itk:AutoCompleteBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Submit}"/>
+                                        <KeyBinding Key="Esc" Command="{Binding Cancel}"/>
+                                    </itk:AutoCompleteBox.InputBindings>
                                 </itk:AutoCompleteBox>
                             </Border>
                         </DataTemplate>
@@ -401,7 +231,7 @@
                                         <Setter Property="BorderThickness" Value="2"/>
                                         <Setter Property="BorderBrush" Value="Gray"/>
                                         <Setter Property="CornerRadius" Value="5"/>
-                                        <Setter Property="Height" Value="20"/>
+                                        <Setter Property="Height" Value="25"/>
                                     </Style>
                                 </Border.Style>
                                 <Grid>
@@ -463,9 +293,10 @@
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Margin" Value="3,0"/>
                                                     <Setter Property="Foreground" Value="#4E4F58"/>
-                                                    <Setter Property="FontSize" Value="11"/>
+                                                    <Setter Property="FontSize" Value="12"/>
                                                     <Setter Property="FontWeight" Value="DemiBold"/>
                                                     <Setter Property="TextAlignment" Value="Center"/>
+                                                    <Setter Property="VerticalAlignment" Value="Center"/>
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
@@ -493,7 +324,7 @@
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Setter Property="Margin" Value="2,2,0,2"/>
-                                        <Setter Property="Width" Value="20"/>
+                                        <Setter Property="Width" Value="25"/>
                                         <Setter Property="CornerRadius" Value="5"/>
                                         <Setter Property="Background" Value="LightGray"/>
                                         <Style.Triggers>
