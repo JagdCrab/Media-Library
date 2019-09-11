@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using System.Windows.Media.Imaging;
 using System.Windows;
 
@@ -57,6 +58,7 @@ namespace Media_Library.ViewModel
 
         public Command RefreshMetadata { get; }
         public Command RefreshFileInfo { get; }
+        public Command RefreshScreenlist { get; }
 
         public Command EnableEditMode { get; }
         public Command SaveChanges { get; }
@@ -106,7 +108,10 @@ namespace Media_Library.ViewModel
 
             #region OperationalAttributes
 
-            EditMode = new Observable<bool> { Value = false };
+            EditMode = new Observable<bool>() { Value = false };
+            LoadingIndicatorCurrent = new Observable<int>();
+            LoadingIndicatorMax = new Observable<int>();
+            LoadingIndicatorVisibility = new Observable<Visibility>() { Value = Visibility.Hidden };
 
             #endregion
 
@@ -121,6 +126,16 @@ namespace Media_Library.ViewModel
                     Favorite.Value = !Favorite.Value;
             }));
 
+            RefreshScreenlist = new Command(new Action(() => {
+                LoadingIndicatorVisibility.Value = Visibility.Visible;
+
+                Task.Factory.StartNew(new Action(() => {
+                    BitmapSource result = MediaAccessor.CreateGridScreenlist(FilePath.Value, LoadingIndicatorCurrent, LoadingIndicatorMax);
+
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { Screenlist.Value = result; }));
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { LoadingIndicatorVisibility.Value = Visibility.Hidden; }));
+                }));
+            }));
 
             EnableEditMode = new Command(new Action(() => {
                 EditMode.Value = true;

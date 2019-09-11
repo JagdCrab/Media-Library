@@ -157,7 +157,7 @@ namespace Media_Library.ViewModel
         public string Description { get; }
         public SolidColorBrush Background { get; }
 
-        public Command ChangeState;
+        public Command ChangeState { get; }
 
         public IntensityState(Intensity _intensity, TagEntity _parent)
         {

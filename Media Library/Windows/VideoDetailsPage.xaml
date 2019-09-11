@@ -287,7 +287,27 @@
                                             </Polygon.Points>
                                         </Polygon>
                                     </Border>
-                                    <Grid Grid.Column="1">
+                                    <Border Grid.Column="1">
+                                        <Border.Resources>
+                                            <ResourceDictionary Source="..\Styles\ContextMenu.xaml"/>
+                                        </Border.Resources>
+                                        <Border.ContextMenu>
+                                            <ContextMenu IsEnabled="{Binding Data.Value, Source={StaticResource EditMode}}" Visibility="{Binding Data.Value, Source={StaticResource EditMode}, Converter={StaticResource VisibilityConverter}}" ItemsSource="{Binding PossibleIntensityStates}">
+                                                <ContextMenu.ItemContainerStyle>
+                                                    <Style TargetType="{x:Type MenuItem}">
+                                                        <Setter Property="Command" Value="{Binding ChangeState}"/>
+                                                        <Setter Property="Template" Value="{DynamicResource {ComponentResourceKey ResourceId=SubmenuItemTemplateKey, TypeInTargetAssembly={x:Type MenuItem}}}"/>
+                                                    </Style>
+                                                </ContextMenu.ItemContainerStyle>
+                                                <ContextMenu.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Margin="1" Background="{Binding Background}" CornerRadius="3">
+                                                            <TextBlock Margin="5 3 5 3" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#50514F" Text="{Binding Description}" Style="{StaticResource Bold}"/>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ContextMenu.ItemTemplate>
+                                            </ContextMenu>
+                                        </Border.ContextMenu>
                                         <TextBlock Grid.Column="1" Text="{Binding Text}">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
@@ -300,21 +320,7 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
-                                        <Popup>
-                                            <ItemsControl ItemsSource="{Binding PossibleIntensityStates}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Vertical"/>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding Description}"/>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </Popup>
-                                    </Grid>
+                                    </Border>
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -325,6 +331,7 @@
                                     <Style TargetType="Border">
                                         <Setter Property="Margin" Value="2,2,0,2"/>
                                         <Setter Property="Width" Value="25"/>
+                                        <Setter Property="Height" Value="25"/>
                                         <Setter Property="CornerRadius" Value="5"/>
                                         <Setter Property="Background" Value="LightGray"/>
                                         <Style.Triggers>
@@ -591,15 +598,25 @@
                         </tk:AccordionItem.Header>
                         <tk:AccordionItem.Content>
                             <Grid Height="140">
-                                <Image Source="{Binding Screenlist.Value}"/>
-                                <Grid Height="100" Width="100" Visibility="{Binding LoadingIndicatorVisibility.Value}">
-                                    <Grid.Resources>
+                                <Image Source="{Binding Screenlist.Value}">
+                                    <Image.ContextMenu>
+                                        <ContextMenu IsEnabled="{Binding Data.Value, Source={StaticResource EditMode}}" Visibility="{Binding Data.Value, Source={StaticResource EditMode}, Converter={StaticResource VisibilityConverter}}">
+                                            <MenuItem Command="{Binding RefreshScreenlist}">
+                                                <MenuItem.Header>
+                                                    <TextBlock Text="Refresh"/>
+                                                </MenuItem.Header>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Image.ContextMenu>
+                                </Image>
+                                <Border Height="100" Width="100" Visibility="{Binding LoadingIndicatorVisibility.Value}" Background="White" CornerRadius="50">
+                                    <Border.Resources>
                                         <ResourceDictionary Source="..\Styles\RadialProgressBar.xaml"/>
-                                    </Grid.Resources>
+                                    </Border.Resources>
                                     <Viewbox>
                                         <ProgressBar Width="300" Height="300" Maximum="{Binding LoadingIndicatorMax.Value}" Value="{Binding LoadingIndicatorCurrent.Value}" Style="{StaticResource ProgressBarStyle}"/>
                                     </Viewbox>
-                                </Grid>
+                                </Border>
                             </Grid>
                         </tk:AccordionItem.Content>
                     </tk:AccordionItem>
