@@ -608,6 +608,9 @@
                                             </MenuItem>
                                         </ContextMenu>
                                     </Image.ContextMenu>
+                                    <Image.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick" Command="{Binding ShowScreenlist}"/>
+                                    </Image.InputBindings>
                                 </Image>
                                 <Border Height="100" Width="100" Visibility="{Binding LoadingIndicatorVisibility.Value}" Background="White" CornerRadius="50">
                                     <Border.Resources>

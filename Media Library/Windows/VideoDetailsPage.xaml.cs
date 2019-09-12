@@ -25,6 +25,11 @@ namespace Media_Library.Windows
     /// </summary>
     public partial class VideoDetailsPage : Page
     {
+        public VideoDetailsPage(string _path)
+        {
+            InitializeComponent();
+        }
+
         public VideoDetailsPage(VideoRecord _videoRecord)
         {
             InitializeComponent();
@@ -70,10 +75,9 @@ namespace Media_Library.Windows
                     ((VideoDetailsPageViewModel)this.DataContext).Icon.Value = image;
 
 
-                    //var cropWindow = new CropWindow(context.Icon);
-                    //cropWindow.Owner = this;
-                    //cropWindow.Show();
-                    //cropWindow.Activate();
+                    var cropWindow = new CropWindow(((VideoDetailsPageViewModel)this.DataContext).Icon);
+                    cropWindow.Show();
+                    cropWindow.Activate();
                 }
             }
             sender.Background = new SolidColorBrush(Colors.Transparent);

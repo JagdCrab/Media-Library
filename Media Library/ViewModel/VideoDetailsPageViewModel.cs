@@ -9,6 +9,7 @@ using System.Windows;
 
 using Media_Library.Data;
 using Media_Library.Components;
+using Media_Library.Windows;
 
 namespace Media_Library.ViewModel
 {
@@ -59,6 +60,8 @@ namespace Media_Library.ViewModel
         public Command RefreshMetadata { get; }
         public Command RefreshFileInfo { get; }
         public Command RefreshScreenlist { get; }
+
+        public Command ShowScreenlist { get; }
 
         public Command EnableEditMode { get; }
         public Command SaveChanges { get; }
@@ -135,6 +138,12 @@ namespace Media_Library.ViewModel
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { Screenlist.Value = result; }));
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { LoadingIndicatorVisibility.Value = Visibility.Hidden; }));
                 }));
+            }));
+
+            ShowScreenlist = new Command(new Action(() => {
+                var viewer = new ScreenshotWindow(Screenlist.Value);
+                viewer.Show();
+                viewer.Activate();
             }));
 
             EnableEditMode = new Command(new Action(() => {

@@ -100,12 +100,20 @@
     <Compile Include="Components\ValueConverters.cs" />
     <Compile Include="Data\FileSystemAccesser.cs" />
     <Compile Include="Data\MediaAccessor.cs" />
+    <Compile Include="ViewModel\CropWindowViewModel.cs" />
     <Compile Include="ViewModel\EntitiesViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="ViewModel\ScreenshotWindowViewModel.cs" />
     <Compile Include="ViewModel\SeriesDetailsWindowViewModel.cs" />
     <Compile Include="ViewModel\SettingsTabViewModel.cs" />
     <Compile Include="ViewModel\TagViewModel.cs" />
     <Compile Include="ViewModel\VideoDetailsPageViewModel.cs" />
+    <Compile Include="Windows\CropWindow.xaml.cs">
+      <DependentUpon>CropWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ScreenshotWindow.xaml.cs">
+      <DependentUpon>ScreenshotWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\SeriesDetailsWindow.xaml.cs">
       <DependentUpon>SeriesDetailsWindow.xaml</DependentUpon>
     </Compile>
@@ -128,6 +136,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\CropWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -146,6 +158,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Styles\TextBlock.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ScreenshotWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

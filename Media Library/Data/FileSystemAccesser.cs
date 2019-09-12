@@ -12,10 +12,7 @@ namespace Media_Library.Data
         public static List<FileInfo> ScanFolderForVideoFiles(string _folder)
         {
             var result = new List<FileInfo>();
-
-            if (!Directory.Exists(_folder))
-                throw new DirectoryNotFoundException();
-
+            
             var rawFilesList = Directory.EnumerateFiles(_folder,"*.*",SearchOption.AllDirectories);
             //var rawFilesList = Directory.EnumerateFiles(_folder);
 

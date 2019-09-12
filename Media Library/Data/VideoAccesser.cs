@@ -444,6 +444,46 @@ namespace Media_Library.Data
 
         #endregion
 
+        #region Setters
+        public static VideoRecord CreateNewVideoRecord(SQLiteTransaction _transaction)
+        {
+            var record = new VideoRecord();
+
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Insert into [VideoRecords] ([Inserted],[Deleted]) Values (@inserted, @deleted);";
+                command.Parameters.Add(new SQLiteParameter("@inserted") { DbType = DbType.String, Value = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss.fffffff") });
+                command.Parameters.Add(new SQLiteParameter("@deleted") { DbType = DbType.Int32, Value = 0 });
+
+                command.ExecuteNonQuery();
+            }
+
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Select [Vid], [Inserted], [Deleted] From [VideoRecords] Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _transaction.Connection.LastInsertRowId });
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                        throw new KeyNotFoundException();
+
+                    reader.Read();
+
+                    record.Vid = reader.GetInt32(0);
+                    record.Inserted = reader.GetDateTime(1);
+                    record.Deleted = Convert.ToBoolean(reader.GetInt32(2));
+                }
+            }
+
+            return record;
+        }
+
+        public static void UpdateVRFileAttr(SQLiteTransaction _transaction, )
+        #endregion
+
 
     }
 }

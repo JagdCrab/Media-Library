@@ -26,6 +26,10 @@ namespace Media_Library.ViewModel
         public Command ScanFolderForVideoFiles {
             get {
                 return new Command(new Action(() => {
+
+                    if (!Directory.Exists(FolderToScan.Value))
+                        return;
+
                     var rawVideoList = FileSystemAccesser.ScanFolderForVideoFiles(FolderToScan.Value);
                     Task.Factory.StartNew(new Action(() => getMissingVideoFiles(rawVideoList)));
                 }));
@@ -80,15 +84,8 @@ namespace Media_Library.ViewModel
         public string Directory { get; }
         public string Name { get; }
         public string Size { get; }
-        public Command AddVideoFile
-        {
-            get
-            {
-                return new Command(new Action(() => {
-                    string click = "clicked";
-                }));
-            }
-        }
+
+        public Command AddVideoFile { get; }
 
         public MissingVideoFile(FileInfo _fileInfo)
         {
@@ -96,6 +93,12 @@ namespace Media_Library.ViewModel
             Directory = _fileInfo.Directory.Name;
             Name = _fileInfo.Name;
             Size = _fileInfo.Length.ToString();
+
+            AddVideoFile = new Command(new Action(() => {
+                var transaction = VideoAccesser.CreateTransaction();
+                var record = VideoAccesser.CreateNewVideoRecord(transaction);
+                transaction.Rollback();
+            }));
         }
     }
 }
