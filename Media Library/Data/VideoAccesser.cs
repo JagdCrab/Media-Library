@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using System.Data;
 using System.Data.SQLite;
 using System.Configuration;
@@ -445,10 +446,8 @@ namespace Media_Library.Data
         #endregion
 
         #region Setters
-        public static VideoRecord CreateNewVideoRecord(SQLiteTransaction _transaction)
+        public static long CreateNewRecord(SQLiteTransaction _transaction)
         {
-            var record = new VideoRecord();
-
             using (var command = _transaction.Connection.CreateCommand())
             {
                 command.Transaction = _transaction;
@@ -459,29 +458,242 @@ namespace Media_Library.Data
                 command.ExecuteNonQuery();
             }
 
+            return _transaction.Connection.LastInsertRowId;
+        }
+
+        public static void UpdateFilePath(SQLiteTransaction _transaction, long _vid, string _path)
+        {
             using (var command = _transaction.Connection.CreateCommand())
             {
                 command.Transaction = _transaction;
-                command.CommandText = @"Select [Vid], [Inserted], [Deleted] From [VideoRecords] Where [Vid] = @vid;";
-                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _transaction.Connection.LastInsertRowId });
+                command.CommandText = @"Update [VideoRecords] Set [File_Path] = @path Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@path") { DbType = DbType.String, Value = _path });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
 
-                using (var reader = command.ExecuteReader())
-                {
-                    if (!reader.HasRows)
-                        throw new KeyNotFoundException();
-
-                    reader.Read();
-
-                    record.Vid = reader.GetInt32(0);
-                    record.Inserted = reader.GetDateTime(1);
-                    record.Deleted = Convert.ToBoolean(reader.GetInt32(2));
-                }
+                command.ExecuteNonQuery();
             }
-
-            return record;
         }
 
-        public static void UpdateVRFileAttr(SQLiteTransaction _transaction, )
+        public static void UpdateFileName(SQLiteTransaction _transaction, long _vid, string _name)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [File_Name] = @name Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@name") { DbType = DbType.String, Value = _name });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public static void UpdateFileExtention(SQLiteTransaction _transaction, long _vid, string _extention)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [File_Extention] = @extention Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@extention") { DbType = DbType.String, Value = _extention });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public static void UpdateFileSize(SQLiteTransaction _transaction, long _vid, long _size)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [File_Size] = @size Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@size") { DbType = DbType.Int64, Value = _size });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public static void UpdateAlias(SQLiteTransaction _transaction, long _vid, string _alias)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Alias] = @alias Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@alias") { DbType = DbType.String, Value = _alias });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateAltAlias(SQLiteTransaction _transaction, long _vid, string _altAlias)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Alt_Alias] = @altAlias Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@altAlias") { DbType = DbType.String, Value = _altAlias });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateSeries(SQLiteTransaction _transaction, long _vid, string _series)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Series] = @series Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@series") { DbType = DbType.String, Value = _series });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateAltSeries(SQLiteTransaction _transaction, long _vid, string _altSeries)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Alt_Series] = @altSeries Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@altSeries") { DbType = DbType.String, Value = _altSeries });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateIcon(SQLiteTransaction _transaction, long _vid, BitmapSource _icon)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Icon] = @icon Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@icon") { DbType = DbType.Binary, Value = _icon.GetByteArray() });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateScore(SQLiteTransaction _transaction, long _vid, int _score)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Score] = @score Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@score") { DbType = DbType.Int32, Value = _score });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateFavorite(SQLiteTransaction _transaction, long _vid, bool _favorite)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Favorite] = @favorite Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@favorite") { DbType = DbType.Int32, Value = _favorite.GetInt() });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateDuration(SQLiteTransaction _transaction, long _vid, TimeSpan _duration)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Duration] = @duration Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@duration") { DbType = DbType.String, Value = _duration.ToString("G") });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateIntensity(SQLiteTransaction _transaction, long _vid, string _intensity)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Intensity] = @intensity Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@intensity") { DbType = DbType.String, Value = _intensity });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateLastPlayback(SQLiteTransaction _transaction, long _vid, DateTime _lastPlayback)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Last_Playback] = @lastPlayback Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@lastPlayback") { DbType = DbType.String, Value = _lastPlayback.ToString("yyyy-MM-dd hh:mm:ss.fffffff") });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateFormat(SQLiteTransaction _transaction, long _vid, string _format)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Format] = @format Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@format") { DbType = DbType.String, Value = _format });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateResolution(SQLiteTransaction _transaction, long _vid, string _resolution)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Resolution] = @resolution Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@resolution") { DbType = DbType.String, Value = _resolution });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateChecksum(SQLiteTransaction _transaction, long _vid, string _checksum)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Checksum] = @checksum Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@checksum") { DbType = DbType.String, Value = _checksum });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateInserted(SQLiteTransaction _transaction, long _vid, DateTime _inserted)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Inserted] = @inserted Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@inserted") { DbType = DbType.String, Value = _inserted.ToString("yyyy-MM-dd hh:mm:ss.fffffff") });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void UpdateDeleted(SQLiteTransaction _transaction, long _vid, bool _deleted)
+        {
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Update [VideoRecords] Set [Deleted] = @deleted Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@deleted") { DbType = DbType.Int32, Value = _deleted.GetInt() });
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                command.ExecuteNonQuery();
+            }
+        }
+
         #endregion
 
 

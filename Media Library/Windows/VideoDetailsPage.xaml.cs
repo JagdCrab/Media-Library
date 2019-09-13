@@ -28,12 +28,15 @@ namespace Media_Library.Windows
         public VideoDetailsPage(string _path)
         {
             InitializeComponent();
+            this.DataContext = new VideoDetailsPageViewModel(_path);
+            VideoInfoTab.IsSelected = true;
         }
 
         public VideoDetailsPage(VideoRecord _videoRecord)
         {
             InitializeComponent();
             this.DataContext = new VideoDetailsPageViewModel(_videoRecord);
+            ScreenlistTab.IsSelected = true;
         }
 
         private void Border_DragEnter(object _sender, DragEventArgs e)

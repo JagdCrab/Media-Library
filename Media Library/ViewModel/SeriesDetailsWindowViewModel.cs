@@ -15,6 +15,12 @@ namespace Media_Library.ViewModel
         public string Series { get; }
         public ObservableCollection<VideoDetailsPage> VideoDetailsPages { get; }
 
+        public SeriesDetailsWindowViewModel(string _path)
+        {
+            Series = "Add New Entry...";
+            VideoDetailsPages = new ObservableCollection<VideoDetailsPage>() { new VideoDetailsPage(_path) };
+        }
+
         public SeriesDetailsWindowViewModel(VideoSeries _series)
         {
             Series = _series.Series;

@@ -8,6 +8,14 @@ namespace Media_Library.Data
 {
     static class AccesserExtentions
     {
+        internal static int GetInt(this bool b)
+        {
+            if (b)
+                return 1;
+            else
+                return 0;
+        }
+
         internal static BitmapSource GetBitmap(this SQLiteDataReader reader, int colIndex)
         {
             using (var stream = reader.GetStream(colIndex))

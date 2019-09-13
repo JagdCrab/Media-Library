@@ -22,6 +22,12 @@ namespace Media_Library.Windows
     /// </summary>
     public partial class SeriesDetailsWindow : Window
     {
+        public SeriesDetailsWindow(string _path)
+        {
+            InitializeComponent();
+            this.DataContext = new SeriesDetailsWindowViewModel(_path);
+        }
+
         public SeriesDetailsWindow(VideoSeries _series)
         {
             InitializeComponent();

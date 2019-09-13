@@ -10,8 +10,9 @@ using System.Configuration;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-using Media_Library.Components;
 using Media_Library.Data;
+using Media_Library.Components;
+using Media_Library.Windows;
 
 using System.Data.SQLite;
 
@@ -95,9 +96,9 @@ namespace Media_Library.ViewModel
             Size = _fileInfo.Length.ToString();
 
             AddVideoFile = new Command(new Action(() => {
-                var transaction = VideoAccesser.CreateTransaction();
-                var record = VideoAccesser.CreateNewVideoRecord(transaction);
-                transaction.Rollback();
+                var window = new SeriesDetailsWindow(Path);
+                window.Show();
+                window.Activate();
             }));
         }
     }

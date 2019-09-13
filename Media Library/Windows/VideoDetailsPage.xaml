@@ -404,7 +404,7 @@
                     <ResourceDictionary Source="..\Styles\Accordion.xaml" />
                 </Border.Resources>
                 <tk:Accordion HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <tk:AccordionItem HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsSelected="False">
+                    <tk:AccordionItem x:Name="VideoInfoTab" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                         <tk:AccordionItem.Header>
                             <TextBlock Margin="0,0,0,6" Text="Video Info" Style="{StaticResource Bold}"/>
                         </tk:AccordionItem.Header>
@@ -592,7 +592,7 @@
                             </ScrollViewer>
                         </tk:AccordionItem.Content>
                     </tk:AccordionItem>
-                    <tk:AccordionItem HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsSelected="true">
+                    <tk:AccordionItem x:Name="ScreenlistTab" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                         <tk:AccordionItem.Header>
                             <TextBlock Margin="0,0,0,6" Text="Screenlist" Style="{StaticResource Bold}"/>
                         </tk:AccordionItem.Header>

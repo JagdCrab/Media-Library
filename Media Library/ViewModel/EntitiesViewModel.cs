@@ -223,7 +223,7 @@ namespace Media_Library.ViewModel
         }
 
         public Command ChangeState { get; }
-
+        
         public DurationEntity(TimeSpan _duration)
         {
             if (_duration.TotalMinutes < 20)

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using System.Data.SQLite;
 
 using Media_Library.Data;
 using Media_Library.Components;
@@ -15,6 +17,9 @@ namespace Media_Library.ViewModel
 {
     class VideoDetailsPageViewModel
     {
+        private long vid { get; set; }
+        private SQLiteTransaction transaction { get; set; }
+
         public Observable<bool> EditMode { get; }
         public Observable<Visibility> AliasError { get; }
         public Observable<Visibility> SeriesError { get; }
@@ -69,17 +74,16 @@ namespace Media_Library.ViewModel
         public Command PlayNow { get; }
         public Command AddToPlaylist { get; }
 
-        public VideoDetailsPageViewModel(VideoRecord _record)
+        #region Open Record Constructor
+
+        public VideoDetailsPageViewModel(VideoRecord _record) : this()
         {
-            #region DataAttributes
+            vid = Convert.ToInt64(_record.Vid);
 
-            SeriesAutoCompleteEntities = VideoAccesser.GetVideoSeriesAutoComplete();
-            AltSeriesAutoCompleteEntities = VideoAccesser.GetVideoAltSeriesAutoComplete();
+            Icon.Value = _record.Icon ;
 
-            Icon = new Observable<BitmapSource>() { Value = _record.Icon };
-
-            Playlist = new Observable<bool>() { Value = VideoAccesser.CheckIfInPlaylist(_record) };
-            Favorite = new Observable<bool>() { Value = _record.Favorite };
+            Playlist.Value = VideoAccesser.CheckIfInPlaylist(_record);
+            Favorite.Value = _record.Favorite;
 
             ScoreUI = new ScoreEntity(_record.Score);
             IntensityUI = new IntensityEntity(_record.Intensity);
@@ -90,32 +94,103 @@ namespace Media_Library.ViewModel
             foreach (var tag in _record.Tags)
                 VideoTags.Entities.Insert(VideoTags.Entities.Count - 1, new TagEntity(tag, VideoTags.Entities));
 
-            Alias = new Observable<string>() { Value = _record.Alias };
-            Series = new Observable<string>() { Value = _record.Series };
-            Alt_Alias = new Observable<string>() { Value = _record.Alt_Alias };
-            Alt_Series = new Observable<string>() { Value = _record.Alt_Series };
+            Alias.Value = _record.Alias;
+            Series.Value = _record.Series;
+            Alt_Alias.Value = _record.Alt_Alias;
+            Alt_Series.Value = _record.Alt_Series;
 
-            Duration = new Observable<string>() { Value = _record.Duration.ToString(@"mm\:ss") };
-            Bitrate = new Observable<string>() { Value = Math.Round(_record.File_Size / (double)_record.Duration.TotalSeconds).ToString() + "bps" };
-            Frame = new Observable<string>() { Value = _record.Resolution };
-            Format = new Observable<string>() { Value = _record.Format };
+            Duration.Value = _record.Duration.ToString(@"mm\:ss");
+            Bitrate.Value = Math.Round(_record.File_Size / _record.Duration.TotalSeconds).ToString() + "bps";
+            Frame.Value = _record.Resolution;
+            Format.Value = _record.Format;
 
-            FilePath = new Observable<string>() { Value = _record.File_Path };
-            FileName = new Observable<string>() { Value = _record.File_Name };
-            Extention = new Observable<string>() { Value = _record.File_Extention };
-            FileSize = new Observable<string>() { Value = Math.Round(_record.File_Size / 1048576d, 1).ToString() + "MB" };
+            FilePath.Value = _record.File_Path;
+            FileName.Value = _record.File_Name;
+            Extention.Value = _record.File_Extention;
+            FileSize.Value = Math.Round(_record.File_Size / 1048576d, 1).ToString() + "MB";
 
-            Screenlist = new Observable<BitmapSource>() { Value = _record.Screenlist.Screenlist };
+            Screenlist.Value = _record.Screenlist.Screenlist;
+        }
+        #endregion
 
-            #endregion
+        #region New Record Constructor
+        public VideoDetailsPageViewModel(string _path) : this()
+        {
+            transaction = VideoAccesser.CreateTransaction();
+            vid = VideoAccesser.CreateNewRecord(transaction);
 
-            #region OperationalAttributes
+            EditMode.Value = true;
+
+            var fileInfo = new FileInfo(_path);
+            var mediaInfo = MediaAccessor.GetMetaData(_path);
+            
+            VideoAccesser.UpdateDuration(transaction, vid, mediaInfo.Metadata.Duration);
+            Duration.Value = mediaInfo.Metadata.Duration.ToString(@"mm\:ss");
+            Bitrate.Value = Math.Round(fileInfo.Length / mediaInfo.Metadata.Duration.TotalSeconds).ToString() + "bps";
+
+            VideoAccesser.UpdateResolution(transaction, vid, mediaInfo.Metadata.VideoData.FrameSize);
+            Frame.Value = mediaInfo.Metadata.VideoData.FrameSize;
+
+            VideoAccesser.UpdateFormat(transaction, vid, mediaInfo.Metadata.VideoData.Format);
+            Format.Value = mediaInfo.Metadata.VideoData.Format;
+
+            VideoAccesser.UpdateFilePath(transaction, vid, fileInfo.FullName);
+            FilePath.Value = fileInfo.FullName;
+
+            VideoAccesser.UpdateFileName(transaction, vid, fileInfo.Name);
+            FileName.Value = fileInfo.Name;
+
+            VideoAccesser.UpdateFileExtention(transaction, vid, fileInfo.Extension);
+            Extention.Value = fileInfo.Extension;
+
+            VideoAccesser.UpdateFileSize(transaction, vid, fileInfo.Length);
+            FileSize.Value = Math.Round(fileInfo.Length / 1048576d, 1).ToString() + "MB";
+            
+            ScoreUI = new ScoreEntity();
+            IntensityUI = new IntensityEntity();
+            DurationUI = new DurationEntity(mediaInfo.Metadata.Duration);
+        }
+        #endregion
+
+        #region Common Constructor
+        private VideoDetailsPageViewModel()
+        {
+            #region DataAttributes
 
             EditMode = new Observable<bool>() { Value = false };
-            LoadingIndicatorCurrent = new Observable<int>();
-            LoadingIndicatorMax = new Observable<int>();
-            LoadingIndicatorVisibility = new Observable<Visibility>() { Value = Visibility.Hidden };
+            AliasError = new Observable<Visibility>() { Value = Visibility.Hidden };
+            SeriesError = new Observable<Visibility>() { Value = Visibility.Hidden };
 
+            SeriesAutoCompleteEntities = VideoAccesser.GetVideoSeriesAutoComplete();
+            AltSeriesAutoCompleteEntities = VideoAccesser.GetVideoAltSeriesAutoComplete();
+
+            Icon = new Observable<BitmapSource>();
+
+            Playlist = new Observable<bool>();
+            Favorite = new Observable<bool>();
+            
+            VideoTags = new TagPresenter();
+            
+            Alias = new Observable<string>();
+            Series = new Observable<string>();
+            Alt_Alias = new Observable<string>();
+            Alt_Series = new Observable<string>();
+
+            Duration = new Observable<string>();
+            Bitrate = new Observable<string>();
+            Frame = new Observable<string>();
+            Format = new Observable<string>();
+
+            FilePath = new Observable<string>();
+            FileName = new Observable<string>();
+            Extention = new Observable<string>();
+            FileSize = new Observable<string>();
+
+            Screenlist = new Observable<BitmapSource>();
+            
+            LoadingIndicatorVisibility = new Observable<Visibility>() { Value = Visibility.Hidden };
+            LoadingIndicatorMax = new Observable<int>();
+            LoadingIndicatorCurrent = new Observable<int>();
             #endregion
 
             #region Commands
@@ -127,6 +202,15 @@ namespace Media_Library.ViewModel
             SwitchFavorite = new Command(new Action(() => {
                 if (EditMode.Value)
                     Favorite.Value = !Favorite.Value;
+            }));
+
+
+            RefreshMetadata = new Command(new Action(() => {
+                throw new NotImplementedException();
+            }));
+
+            RefreshFileInfo = new Command(new Action(() => {
+                throw new NotImplementedException();
             }));
 
             RefreshScreenlist = new Command(new Action(() => {
@@ -147,17 +231,24 @@ namespace Media_Library.ViewModel
             }));
 
             EnableEditMode = new Command(new Action(() => {
+                transaction = VideoAccesser.CreateTransaction();
                 EditMode.Value = true;
             }));
 
             SaveChanges = new Command(new Action(() => {
                 EditMode.Value = false;
+                transaction.Rollback();
+                transaction.Dispose();
             }));
 
             RevertChanges = new Command(new Action(() => {
                 EditMode.Value = false;
+                transaction.Rollback();
+                transaction.Dispose();
             }));
             #endregion
+
         }
+        #endregion
     }
 }
