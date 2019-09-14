@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -88,7 +89,7 @@ namespace Media_Library.ViewModel
             ScoreUI = new ScoreEntity(_record.Score);
             IntensityUI = new IntensityEntity(_record.Intensity);
             DurationUI = new DurationEntity(_record.Duration);
-
+            
             VideoTags = new TagPresenter();
 
             foreach (var tag in _record.Tags)
@@ -110,6 +111,9 @@ namespace Media_Library.ViewModel
             FileSize.Value = Math.Round(_record.File_Size / 1048576d, 1).ToString() + "MB";
 
             Screenlist.Value = _record.Screenlist.Screenlist;
+            
+            IntensityUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIntensity(transaction, vid, IntensityUI.Intensity.Value); };
+
         }
         #endregion
 

@@ -5,23 +5,34 @@ namespace Media_Library.Components
 {
     public class Command : ICommand
     {
-        private Action<object> _action;
+        private Action<object> action;
+        private Predicate<object> predicate;
 
-        public Command(Action<object> action)
+
+        public Command(Action<object> _action)
         {
-            _action = action;
+            action = _action;
         }
 
-        public Command(Action action)
+        public Command(Action _action)
         {
-            _action = new Action<object>(o => action());
+            action = new Action<object>(o => _action());
+        }
+
+        public Command(Action _action, Predicate<object> _predicate)
+        {
+            action = new Action<object>(o => _action());
+            predicate = _predicate;
         }
 
         #region ICommand Members
 
         public bool CanExecute(object parameter)
         {
-            return true;
+            if (predicate == null)
+                return true;
+            else
+                return predicate(parameter);
         }
 
         public event EventHandler CanExecuteChanged;
@@ -30,11 +41,11 @@ namespace Media_Library.Components
         {
             if (parameter != null)
             {
-                _action(parameter);
+                action(parameter);
             }
             else
             {
-                _action("Hello World");
+                action("Hello World");
             }
         }
 

@@ -154,26 +154,44 @@
                         <Grid.Resources>
                             <ResourceDictionary Source="..\Styles\ContextMenu.xaml"/>
                         </Grid.Resources>
-                        <Border Background="{Binding Background.Value}" CornerRadius="3">
-                            <Border.ContextMenu>
-                                <ContextMenu IsEnabled="{Binding Data.Value, Source={StaticResource EditMode}}" Visibility="{Binding Data.Value, Source={StaticResource EditMode}, Converter={StaticResource VisibilityConverter}}" ItemsSource="{Binding PossibleStates}">
-                                    <ContextMenu.ItemContainerStyle>
-                                        <Style TargetType="{x:Type MenuItem}">
-                                            <Setter Property="Command" Value="{Binding ChangeState}"/>
-                                            <Setter Property="Template" Value="{DynamicResource {ComponentResourceKey ResourceId=SubmenuItemTemplateKey, TypeInTargetAssembly={x:Type MenuItem}}}"/>
-                                        </Style>
-                                    </ContextMenu.ItemContainerStyle>
-                                    <ContextMenu.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Margin="1" Background="{Binding Background.Value}" CornerRadius="3">
-                                                <TextBlock Margin="5 3 5 3" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Text="{Binding Intensity.Value}" Style="{StaticResource Bold}"/>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ContextMenu.ItemTemplate>
-                                </ContextMenu>
-                            </Border.ContextMenu>
+                        <Border x:Name="IntensitySelector" Background="{Binding Background.Value}" CornerRadius="3" MouseRightButtonUp="IntensitySelector_MouseRightButtonUp">
                             <TextBlock Margin="7 3 7 3" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Intensity.Value}" Style="{StaticResource Bold}"/>
                         </Border>
+                        <Popup x:Name="IntensityPopup" IsOpen="{Binding MenuOpened.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" StaysOpen="False" Placement="MousePoint">
+                            <Border BorderBrush="LightGray" BorderThickness="1" Background="White">
+                                <ItemsControl ItemsSource="{Binding PossibleStates}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border>
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="White"/>
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="LightBlue"/>
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <Border Margin="3" Background="{Binding Background.Value}" CornerRadius="3">
+                                                    <TextBlock Margin="3" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Text="{Binding Intensity.Value}"/>
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                                                            <i:InvokeCommandAction Command="{Binding ChangeState}"/>
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </Border>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Popup>
                     </Grid>
 
                     <Grid Grid.Row="5" Margin="0,5,5,0" DataContext="{Binding DurationUI}">

@@ -85,5 +85,11 @@ namespace Media_Library.Windows
             }
             sender.Background = new SolidColorBrush(Colors.Transparent);
         }
+
+        private void IntensitySelector_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (((VideoDetailsPageViewModel)this.DataContext).EditMode.Value)
+                IntensityPopup.IsOpen = true;
+        }
     }
 }

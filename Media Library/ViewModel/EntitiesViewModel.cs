@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -101,10 +102,12 @@ namespace Media_Library.ViewModel
 
     #region Details
 
-    class ScoreEntity
+    class ScoreEntity : INotifyPropertyChanged
     {
         public Observable<int> Score { get; }
         public Observable<SolidColorBrush> Background { get; }
+
+        public Observable<bool> MenuOpened { get; }
 
         public List<ScoreEntity> PossibleStates
         {
@@ -127,16 +130,22 @@ namespace Media_Library.ViewModel
 
         public Command ChangeState { get; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public ScoreEntity()
         {
             Score = new Observable<int>() { Value = -1 };
             Background = new Observable<SolidColorBrush>() { Value = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#C0C0C0")) };
+
+            MenuOpened = new Observable<bool>() { Value = false };
         }
 
         public ScoreEntity(int _score)
         {
             Score = new Observable<int>() { Value = _score };
             Background = new Observable<SolidColorBrush>();
+
+            MenuOpened = new Observable<bool>() { Value = false };
 
             switch (_score)
             {
@@ -201,7 +210,15 @@ namespace Media_Library.ViewModel
             ChangeState = new Command(new Action(() => {
                 _parent.Score.Value = Score.Value;
                 _parent.Background.Value = Background.Value;
+
+                _parent.MenuOpened.Value = false;
+                _parent.NotifyPropertyChanged("Intensity");
             }));
+        }
+
+        private void NotifyPropertyChanged(string _property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_property));
         }
     }
     
@@ -268,15 +285,15 @@ namespace Media_Library.ViewModel
         }
     }
 
-    class IntensityEntity
+    public class IntensityEntity : INotifyPropertyChanged
     {
         public Observable<string> Intensity { get; }
         public Observable<SolidColorBrush> Background { get; }
 
-        public List<IntensityEntity> PossibleStates
-        {
-            get
-            {
+        public Observable<bool> MenuOpened { get; }
+        
+        public List<IntensityEntity> PossibleStates {
+            get {
                 return new List<IntensityEntity>() {
                     new IntensityEntity("Action", this),
                     new IntensityEntity("Mix", this),
@@ -287,16 +304,22 @@ namespace Media_Library.ViewModel
 
         public Command ChangeState { get; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public IntensityEntity()
         {
             Intensity = new Observable<string>() { Value = "N/A" };
             Background = new Observable<SolidColorBrush>() { Value = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#C0C0C0")) };
+
+            MenuOpened = new Observable<bool>() { Value = false };
         }
 
         public IntensityEntity(string _intensity)
         {
             Intensity = new Observable<string>() { Value = _intensity };
             Background = new Observable<SolidColorBrush>();
+
+            MenuOpened = new Observable<bool>() { Value = false };
 
             switch (_intensity)
             {
@@ -317,7 +340,6 @@ namespace Media_Library.ViewModel
 
         public IntensityEntity(string _intensity, IntensityEntity _parent)
         {
-
             Intensity = new Observable<string>() { Value = _intensity };
             Background = new Observable<SolidColorBrush>();
 
@@ -340,7 +362,15 @@ namespace Media_Library.ViewModel
             ChangeState = new Command(new Action(() => {
                 _parent.Intensity.Value = Intensity.Value;
                 _parent.Background.Value = Background.Value;
+                _parent.MenuOpened.Value = false;
+
+                _parent.NotifyPropertyChanged("Intensity");
             }));
+        }
+
+        private void NotifyPropertyChanged(string _property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_property));
         }
     }
     #endregion
