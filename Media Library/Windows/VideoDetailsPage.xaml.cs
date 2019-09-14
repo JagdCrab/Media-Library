@@ -91,5 +91,10 @@ namespace Media_Library.Windows
             if (((VideoDetailsPageViewModel)this.DataContext).EditMode.Value)
                 IntensityPopup.IsOpen = true;
         }
+
+        private void ScoreSelector_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            ScorePopup.IsOpen = true;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:itk="clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Input.Toolkit"
                     xmlns:local="clr-namespace:Media_Library.Styles">
     <Style x:Key="Default" TargetType="TextBlock">
         <Setter Property="FontWeight" Value="Normal"/>

@@ -105,55 +105,67 @@
 
 
                     <Grid Grid.Row="3" Margin="0,5,5,0" DataContext="{Binding ScoreUI}">
-                        <Grid.Resources>
-                            <ResourceDictionary Source="..\Styles\ContextMenu.xaml"/>
-                        </Grid.Resources>
-                        <Border>
-                            <Border.ContextMenu>
-                                <ContextMenu IsEnabled="{Binding Data.Value, Source={StaticResource EditMode}}" Visibility="{Binding Data.Value, Source={StaticResource EditMode}, Converter={StaticResource VisibilityConverter}}" ItemsSource="{Binding PossibleStates}">
-                                    <ContextMenu.ItemContainerStyle>
-                                        <Style TargetType="{x:Type MenuItem}">
-                                            <Setter Property="Command" Value="{Binding ChangeState}"/>
-                                            <Setter Property="Template" Value="{DynamicResource {ComponentResourceKey ResourceId=SubmenuItemTemplateKey, TypeInTargetAssembly={x:Type MenuItem}}}"/>
-                                        </Style>
-                                    </ContextMenu.ItemContainerStyle>
-                                    <ContextMenu.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="25"/>
-                                                    <ColumnDefinition Width="25"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Border BorderThickness="0" CornerRadius="5 0 0 5" Background="{Binding Background.Value}" Grid.Column="0">
-                                                    <TextBlock Margin="5 1" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="{Binding Score.Value}"/>
-                                                </Border>
-                                                <Border BorderThickness="0" CornerRadius="0 5 5 0" Background="#7B7981" Grid.Column="1">
-                                                    <TextBlock Margin="5 1" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="10"/>
-                                                </Border>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ContextMenu.ItemTemplate>
-                                </ContextMenu>
-                            </Border.ContextMenu>
+                        <Border x:Name="ScoreSelector" MouseRightButtonUp="ScoreSelector_MouseRightButtonUp">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="25"/>
-                                    <ColumnDefinition Width="25"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <Border BorderThickness="0" CornerRadius="5 0 0 5" Background="{Binding Background.Value}" Grid.Column="0">
-                                    <TextBlock Margin="5 1" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="{Binding Score.Value}"/>
+                                <Border Grid.Column="0" CornerRadius="5 0 0 5" Background="{Binding Background.Value}">
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="{Binding Score.Value}"/>
                                 </Border>
-                                <Border BorderThickness="0" CornerRadius="0 5 5 0" Background="#7B7981" Grid.Column="1">
-                                    <TextBlock Margin="5 1" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="10"/>
+                                <Border Grid.Column="1" CornerRadius="0 5 5 0" Background="#7B7981">
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="10"/>
                                 </Border>
                             </Grid>
                         </Border>
+                        <Popup x:Name="ScorePopup" IsOpen="{Binding MenuOpened.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" StaysOpen="False" Placement="MousePoint">
+                            <Border BorderBrush="LightGray" BorderThickness="1" Background="White">
+                                <ItemsControl ItemsSource="{Binding PossibleStates}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border>
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="White"/>
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="LightBlue"/>
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                                                        <i:InvokeCommandAction Command="{Binding ChangeState}"/>
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                                <Grid Margin="3" Height="25" Width="50">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border CornerRadius="5 0 0 5" Background="{Binding Background.Value}" Grid.Column="0">
+                                                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="{Binding Score.Value}"/>
+                                                    </Border>
+                                                    <Border CornerRadius="0 5 5 0" Background="#7B7981" Grid.Column="1">
+                                                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Text="10"/>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Popup>
                     </Grid>
 
                     <Grid Grid.Row="4" Margin="0,5,5,0" DataContext="{Binding IntensityUI}">
-                        <Grid.Resources>
-                            <ResourceDictionary Source="..\Styles\ContextMenu.xaml"/>
-                        </Grid.Resources>
                         <Border x:Name="IntensitySelector" Background="{Binding Background.Value}" CornerRadius="3" MouseRightButtonUp="IntensitySelector_MouseRightButtonUp">
                             <TextBlock Margin="7 3 7 3" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Intensity.Value}" Style="{StaticResource Bold}"/>
                         </Border>
@@ -178,8 +190,8 @@
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                                <Border Margin="3" Background="{Binding Background.Value}" CornerRadius="3">
-                                                    <TextBlock Margin="3" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Text="{Binding Intensity.Value}"/>
+                                                <Border Margin="3" Height="25" Width="50" Background="{Binding Background.Value}" CornerRadius="3">
+                                                    <TextBlock Margin="3" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Text="{Binding Intensity.Value}" Style="{StaticResource Bold}"/>
                                                     <i:Interaction.Triggers>
                                                         <i:EventTrigger EventName="MouseLeftButtonUp">
                                                             <i:InvokeCommandAction Command="{Binding ChangeState}"/>
@@ -486,28 +498,28 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Alias:" TextAlignment="Right" Style="{StaticResource Bold}"/>
                                         <TextBlock Grid.Row="0" Grid.Column="1" Margin="3" Text="{Binding Alias.Value}"/>
-                                        <TextBox Grid.Row="0" Grid.Column="2" Margin="3" Text="{Binding Alias.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  BorderBrush="Gray"/>
+                                        <TextBox Grid.Row="0" Grid.Column="2" Margin="3" Text="{Binding Alias.Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" BorderBrush="Gray"/>
                                         <Image Grid.Row="0" Grid.Column="3" Visibility="{Binding AliasError.Value}"/>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Series:" TextAlignment="Right" Style="{StaticResource Bold}"/>
                                         <TextBlock Grid.Row="1" Grid.Column="1" Visibility="{Binding DetailsElementsVisibility.Value}" Margin="3" Text="{Binding Series.Value}"/>
-                                        <itk:AutoCompleteBox Grid.Row="1" Grid.Column="2" Margin="3" FontFamily="Segoe UI" Foreground="Gray" BorderBrush="Gray"
+                                        <itk:AutoCompleteBox Grid.Row="1" Grid.Column="2" Margin="3" BorderBrush="Gray" Padding="0"
                                                              FilterMode="Contains"
                                                              ItemsSource="{Binding SeriesAutoCompleteEntities}"
-                                                             Text="{Binding Series.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                             Text="{Binding Series.Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                         </itk:AutoCompleteBox>
                                         <Image Grid.Row="0" Grid.Column="3" Visibility="{Binding SeriesError.Value}"/>
 
                                         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Alt Alias:" TextAlignment="Right" Style="{StaticResource Bold}"/>
                                         <TextBlock Grid.Row="2" Grid.Column="1" Margin="3" Text="{Binding Alt_Alias.Value}"/>
-                                        <TextBox Grid.Row="2" Grid.Column="2" Margin="3" Text="{Binding Alt_Alias.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  BorderBrush="Gray"/>
+                                        <TextBox Grid.Row="2" Grid.Column="2" Margin="3" Text="{Binding Alt_Alias.Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"  BorderBrush="Gray"/>
 
                                         <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="3" Text="Alt Series:" TextAlignment="Right" Style="{StaticResource Bold}"/>
                                         <TextBlock Grid.Row="3" Grid.Column="1" Margin="3" Text="{Binding Alt_Series.Value}"/>
-                                        <itk:AutoCompleteBox Grid.Row="3" Grid.Column="2" Margin="3" FontFamily="Segoe UI" Foreground="Gray" BorderBrush="Gray"
+                                        <itk:AutoCompleteBox Grid.Row="3" Grid.Column="2" Margin="3" BorderBrush="Gray" Padding="0"
                                                              FilterMode="Contains"
                                                              ItemsSource="{Binding AltSeriesAutoCompleteEntities}"
-                                                             Text="{Binding Alt_Series.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                             Text="{Binding Alt_Series.Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                         </itk:AutoCompleteBox>
                                     </Grid>
                                     <Separator Grid.Row="4"/>

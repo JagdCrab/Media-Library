@@ -113,7 +113,12 @@ namespace Media_Library.ViewModel
             Screenlist.Value = _record.Screenlist.Screenlist;
             
             IntensityUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIntensity(transaction, vid, IntensityUI.Intensity.Value); };
+            ScoreUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateScore(transaction, vid, ScoreUI.Score.Value); };
 
+            Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAlias(transaction, vid, Alias.Value); };
+            Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateSeries(transaction, vid, Series.Value); };
+            Alt_Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltAlias(transaction, vid, Alt_Alias.Value); };
+            Alt_Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltSeries(transaction, vid, Alt_Series.Value); };
         }
         #endregion
 
@@ -205,7 +210,10 @@ namespace Media_Library.ViewModel
 
             SwitchFavorite = new Command(new Action(() => {
                 if (EditMode.Value)
+                {
                     Favorite.Value = !Favorite.Value;
+                    VideoAccesser.UpdateFavorite(transaction, vid, Favorite.Value);
+                }
             }));
 
 
