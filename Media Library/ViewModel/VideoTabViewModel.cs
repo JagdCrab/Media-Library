@@ -18,8 +18,7 @@ namespace Media_Library.ViewModel
 {
     class VideoTabViewModel
     {
-        public ObservableCollection<VideoSeriesEntity> VideoSeriesEntities { get; }
-        public ICollectionView VideoSeriesEntitiesView { get; }
+        public ListCollectionView VideoSeriesEntitiesView { get; }
         
         public Observable<string> AutoCompleteText { get; }
         public Observable<VideoSearchEntity> SelectedSearchEntity { get; }
@@ -91,8 +90,7 @@ namespace Media_Library.ViewModel
 
         public VideoTabViewModel()
         {
-            VideoSeriesEntities = new ObservableCollection<VideoSeriesEntity>();
-            VideoSeriesEntitiesView = CollectionViewSource.GetDefaultView(VideoSeriesEntities);
+            var collection = new List<VideoSeriesEntity>();
 
             AutoCompleteText = new Observable<string>();
             SelectedSearchEntity = new Observable<VideoSearchEntity>();
@@ -105,8 +103,10 @@ namespace Media_Library.ViewModel
                 VideoSearchEntities.Add(new VideoSearchEntity(searchEntity));
 
             foreach (var series in VideoAccesser.GetVideoSeries())
-                VideoSeriesEntities.Add(new VideoSeriesEntity(series));
-            
+                collection.Add(new VideoSeriesEntity(series));
+
+            VideoSeriesEntitiesView = new ListCollectionView(collection);
+
             SelectedOrdering = new Observable<string>() { Value = "Alphabetical" };
         }
     }
