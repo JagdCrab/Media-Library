@@ -694,6 +694,11 @@ namespace Media_Library.Data
             }
         }
 
+        public static void UpdateTag(SQLiteTransaction _transaction, long _tid, string _text, Intensity _intensity)
+        {
+
+        }
+
         #endregion
 
 

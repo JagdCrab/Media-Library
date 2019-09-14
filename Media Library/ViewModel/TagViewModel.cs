@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -15,9 +16,9 @@ namespace Media_Library.ViewModel
 {
     class TagPresenter
     {
-        public ObservableCollection<object> Entities { get; }
+        public BindingList<object> Entities { get; }
         public TagTemplateSelector TemplateSelector { get; }
-
+        
         public class TagTemplateSelector : DataTemplateSelector
         {
             public override DataTemplate SelectTemplate(object item, DependencyObject container)
@@ -40,25 +41,29 @@ namespace Media_Library.ViewModel
 
         public TagPresenter()
         {
-            Entities = new ObservableCollection<object>();
+            Entities = new BindingList<object>();
             TemplateSelector = new TagTemplateSelector();
-
+            
             Entities.Add(new AddButtonEntity(Entities));
         }
     }
 
-    public class TagEntity
+    public class TagEntity : INotifyPropertyChanged
     {
-        public string Text { get; }
+        public long? Id { get; }
+        public string Text { get; set; }
         public Intensity Intensity { get; set; }
 
         public Observable<SolidColorBrush> Background { get; }
+        public Observable<bool> MenuOpened { get; }
 
         public List<IntensityState> PossibleIntensityStates { get; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public Command RemoveTag { get; }
 
-        public TagEntity(string _text, ObservableCollection<object> _parent)
+        public TagEntity(string _text, BindingList<object> _parent)
         {
             Text = _text;
             Intensity = Intensity.Neutral;
@@ -77,10 +82,12 @@ namespace Media_Library.ViewModel
                 new IntensityState(Intensity.High, this),
                 new IntensityState(Intensity.Highest, this)
             };
+            NotifyPropertyChanged("Text");
         }
 
-        public TagEntity(VideoTag _tag, ObservableCollection<object> _parent)
+        public TagEntity(VideoTag _tag, BindingList<object> _parent)
         {
+            Id = _tag.Id;
             Text = _tag.Text;
             Intensity = _tag.Intensity;
 
@@ -100,6 +107,12 @@ namespace Media_Library.ViewModel
             };
 
         }
+
+        public void NotifyPropertyChanged(string _property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_property));
+        }
+
     }
 
     public class NewTagEntity
@@ -114,7 +127,7 @@ namespace Media_Library.ViewModel
         public Command Submit { get; }
         public Command Cancel { get; }
 
-        public NewTagEntity(ObservableCollection<object> _collection)
+        public NewTagEntity(BindingList<object> _collection)
         {
             Text = new Observable<string>();
             AutoCompleteCollection = VideoAccesser.GetVideoTagsAutoComplete();
@@ -136,11 +149,11 @@ namespace Media_Library.ViewModel
 
     public class AddButtonEntity
     {
-        public ObservableCollection<object> Collection { get; }
+        public BindingList<object> Collection { get; }
 
         public Command AddNewTag { get; }
 
-        public AddButtonEntity(ObservableCollection<object> _collection)
+        public AddButtonEntity(BindingList<object> _collection)
         {
             Collection = _collection;
             AddNewTag = new Command(new Action(() => {
@@ -170,6 +183,7 @@ namespace Media_Library.ViewModel
             ChangeState = new Command(new Action(() => {
                 _parent.Background.Value = Background;
                 _parent.Intensity = Intensity;
+                _parent.NotifyPropertyChanged("Intensity");
             }));
         }
     }

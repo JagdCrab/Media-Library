@@ -81,7 +81,7 @@ namespace Media_Library.ViewModel
         {
             vid = Convert.ToInt64(_record.Vid);
 
-            Icon.Value = _record.Icon ;
+            Icon.Value = _record.Icon;
 
             Playlist.Value = VideoAccesser.CheckIfInPlaylist(_record);
             Favorite.Value = _record.Favorite;
@@ -89,8 +89,6 @@ namespace Media_Library.ViewModel
             ScoreUI = new ScoreEntity(_record.Score);
             IntensityUI = new IntensityEntity(_record.Intensity);
             DurationUI = new DurationEntity(_record.Duration);
-            
-            VideoTags = new TagPresenter();
 
             foreach (var tag in _record.Tags)
                 VideoTags.Entities.Insert(VideoTags.Entities.Count - 1, new TagEntity(tag, VideoTags.Entities));
@@ -111,7 +109,9 @@ namespace Media_Library.ViewModel
             FileSize.Value = Math.Round(_record.File_Size / 1048576d, 1).ToString() + "MB";
 
             Screenlist.Value = _record.Screenlist.Screenlist;
-            
+
+            Icon.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIcon(transaction, vid, Icon.Value); };
+
             IntensityUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIntensity(transaction, vid, IntensityUI.Intensity.Value); };
             ScoreUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateScore(transaction, vid, ScoreUI.Score.Value); };
 
@@ -200,6 +200,14 @@ namespace Media_Library.ViewModel
             LoadingIndicatorVisibility = new Observable<Visibility>() { Value = Visibility.Hidden };
             LoadingIndicatorMax = new Observable<int>();
             LoadingIndicatorCurrent = new Observable<int>();
+            #endregion
+
+            #region Events
+
+            VideoTags.Entities.ListChanged += (object o, ListChangedEventArgs e) => {
+                int i = 0;
+            };
+
             #endregion
 
             #region Commands
