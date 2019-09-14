@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
+using Media_Library.Data;
 using Media_Library.Components;
 
 namespace Media_Library.ViewModel
@@ -16,7 +17,8 @@ namespace Media_Library.ViewModel
         public double Height { get; }
         public Action<BitmapSource> Callback { get; }
 
-        public Observable<BitmapSource> Image { get; }
+        public BitmapSource Image { get; }
+        public Observable<BitmapSource> Icon { get; }
 
         public Observable<Point> Anchor { get; }
         public Observable<Size> CropSize { get; }
@@ -32,14 +34,15 @@ namespace Media_Library.ViewModel
 
         public Action CloseAction { get; set; }
 
-        public CropWindowViewModel(Observable<BitmapSource> _image)
+        public CropWindowViewModel(BitmapSource _image, Observable<BitmapSource> _icon)
         {
-            Image = _image;
-            Width = _image.Value.PixelWidth;
-            Height = _image.Value.PixelHeight;
-
-            if (Width > 1600 || Height > 900)
+            Icon = _icon;
+            
+            if (_image.PixelWidth > 1600 || _image.PixelHeight > 900)
             {
+                Width = _image.PixelWidth;
+                Height = _image.PixelHeight;
+
                 double widthScaleFactor = 1600 / Width;
                 double heightScaleFactor = 900 / Height;
 
@@ -53,6 +56,14 @@ namespace Media_Library.ViewModel
                     Width = Width * heightScaleFactor;
                     Height = Height * heightScaleFactor;
                 }
+                
+                Image = MediaAccessor.ResizeImage(_image, Convert.ToInt32(Width), Convert.ToInt32(Height), false);
+            }
+            else
+            {
+                Image = _image;
+                Width = _image.PixelWidth;
+                Height = _image.PixelHeight;
             }
 
             Anchor = new Observable<Point>();
@@ -83,10 +94,10 @@ namespace Media_Library.ViewModel
                 int H = Convert.ToInt32(Hole.Value.Height);
 
                 var Rect = new Int32Rect(X, Y, W, H);
-                var Result = new CroppedBitmap(Image.Value, Rect);
+                var Result = new CroppedBitmap(Image, Rect);
 
                 if (Callback == null)
-                    Image.Value = Result;
+                    Icon.Value = Result;
                 else
                     Callback(Result);
 

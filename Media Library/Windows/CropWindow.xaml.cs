@@ -24,14 +24,14 @@ namespace Media_Library.Windows
     {
         CropWindowViewModel ViewModel;
 
-        public CropWindow(Observable<BitmapSource> _image)
+        public CropWindow(BitmapSource _image, Observable<BitmapSource> _icon)
         {
             InitializeComponent();
 
-            this.Width = _image.Value.PixelWidth;
-            this.Height = _image.Value.PixelHeight;
+            this.Width = _image.PixelWidth;
+            this.Height = _image.PixelHeight;
 
-            ViewModel = new CropWindowViewModel(_image) { CloseAction = this.Close };
+            ViewModel = new CropWindowViewModel(_image, _icon) { CloseAction = this.Close };
             this.DataContext = ViewModel;
         }
 

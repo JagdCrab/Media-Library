@@ -9,7 +9,7 @@
         SizeToContent="WidthAndHeight">
     
     <Grid Width="{Binding Width}" Height="{Binding Height}">
-        <Image x:Name="Image" Source="{Binding Image.Value}"/>
+        <Image x:Name="Image" Source="{Binding Image}"/>
         <Rectangle Fill="Gray" Opacity="0.9">
             <Rectangle.Clip>
                 <CombinedGeometry GeometryCombineMode="Exclude">

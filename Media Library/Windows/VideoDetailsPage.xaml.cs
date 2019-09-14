@@ -75,10 +75,7 @@ namespace Media_Library.Windows
                         image.Freeze();
                     }
 
-                    ((VideoDetailsPageViewModel)this.DataContext).Icon.Value = image;
-
-
-                    var cropWindow = new CropWindow(((VideoDetailsPageViewModel)this.DataContext).Icon);
+                    var cropWindow = new CropWindow(image, ((VideoDetailsPageViewModel)this.DataContext).Icon);
                     cropWindow.Show();
                     cropWindow.Activate();
                 }
