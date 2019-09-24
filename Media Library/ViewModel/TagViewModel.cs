@@ -14,9 +14,19 @@ using Media_Library.Data;
 
 namespace Media_Library.ViewModel
 {
+    public abstract class TagEntityBase : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string _property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_property));
+        }
+    }
+
     class TagPresenter
     {
-        public BindingList<object> Entities { get; }
+        public BindingList<TagEntityBase> Entities { get; }
         public TagTemplateSelector TemplateSelector { get; }
         
         public class TagTemplateSelector : DataTemplateSelector
@@ -41,37 +51,39 @@ namespace Media_Library.ViewModel
 
         public TagPresenter()
         {
-            Entities = new BindingList<object>();
+            Entities = new BindingList<TagEntityBase>();
             TemplateSelector = new TagTemplateSelector();
             
             Entities.Add(new AddButtonEntity(Entities));
         }
     }
 
-    public class TagEntity : INotifyPropertyChanged
+    public class TagEntity : TagEntityBase
     {
-        public long? Id { get; }
         public string Text { get; set; }
         public Intensity Intensity { get; set; }
+        public bool Deleted { get; set; }
 
         public Observable<SolidColorBrush> Background { get; }
         public Observable<bool> MenuOpened { get; }
 
         public List<IntensityState> PossibleIntensityStates { get; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public Command RemoveTag { get; }
 
-        public TagEntity(string _text, BindingList<object> _parent)
+        public TagEntity(string _text, BindingList<TagEntityBase> _parent)
         {
             Text = _text;
             Intensity = Intensity.Neutral;
+            Deleted = false;
 
             var bytes = BitConverter.GetBytes((int)Intensity);
             Background = new Observable<SolidColorBrush>() { Value = new SolidColorBrush(Color.FromArgb(bytes[3], bytes[2], bytes[1], bytes[0])) };
 
             RemoveTag = new Command(new Action(() => {
+                Deleted = true;
+                NotifyPropertyChanged("Deleted");
                 _parent.Remove(this);
             }));
 
@@ -82,19 +94,20 @@ namespace Media_Library.ViewModel
                 new IntensityState(Intensity.High, this),
                 new IntensityState(Intensity.Highest, this)
             };
-            NotifyPropertyChanged("Text");
         }
 
-        public TagEntity(VideoTag _tag, BindingList<object> _parent)
+        public TagEntity(VideoTag _tag, BindingList<TagEntityBase> _parent)
         {
-            Id = _tag.Id;
             Text = _tag.Text;
             Intensity = _tag.Intensity;
+            Deleted = false;
 
             var bytes = BitConverter.GetBytes((int)Intensity);
             Background = new Observable<SolidColorBrush>() { Value = new SolidColorBrush(Color.FromArgb(bytes[3], bytes[2], bytes[1], bytes[0])) };
 
             RemoveTag = new Command(new Action(() => {
+                Deleted = true;
+                NotifyPropertyChanged("Deleted");
                 _parent.Remove(this);
             }));
 
@@ -107,15 +120,9 @@ namespace Media_Library.ViewModel
             };
 
         }
-
-        public void NotifyPropertyChanged(string _property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_property));
-        }
-
     }
 
-    public class NewTagEntity
+    public class NewTagEntity : TagEntityBase
     {
         public Observable<string> Text { get; }
         public List<string> AutoCompleteCollection { get; }
@@ -127,7 +134,7 @@ namespace Media_Library.ViewModel
         public Command Submit { get; }
         public Command Cancel { get; }
 
-        public NewTagEntity(BindingList<object> _collection)
+        public NewTagEntity(BindingList<TagEntityBase> _collection)
         {
             Text = new Observable<string>();
             AutoCompleteCollection = VideoAccesser.GetVideoTagsAutoComplete();
@@ -138,7 +145,9 @@ namespace Media_Library.ViewModel
 
             Submit = new Command(new Action(() => {
                 _collection.Remove(this);
-                _collection.Insert(_collection.Count - 1, new TagEntity(Text.Value, _collection));
+                var newTag = new TagEntity(Text.Value, _collection);
+                _collection.Insert(_collection.Count - 1, newTag);
+                newTag.NotifyPropertyChanged("Added"); //Have to call PropertyChanged after it's added to collection to route event to ListChanged with ItemChanged type
             }));
 
             Cancel = new Command(new Action(() => {
@@ -147,13 +156,13 @@ namespace Media_Library.ViewModel
         }
     }
 
-    public class AddButtonEntity
+    public class AddButtonEntity : TagEntityBase
     {
-        public BindingList<object> Collection { get; }
+        public BindingList<TagEntityBase> Collection { get; }
 
         public Command AddNewTag { get; }
 
-        public AddButtonEntity(BindingList<object> _collection)
+        public AddButtonEntity(BindingList<TagEntityBase> _collection)
         {
             Collection = _collection;
             AddNewTag = new Command(new Action(() => {

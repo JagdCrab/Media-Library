@@ -694,13 +694,101 @@ namespace Media_Library.Data
             }
         }
 
-        public static void UpdateTag(SQLiteTransaction _transaction, long _tid, string _text, Intensity _intensity)
+        public static void UpsertTag(SQLiteTransaction _transaction, long _vid, string _text, Intensity _intensity, bool _deleted)
         {
+            long tid = 0;
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Select [Id] From [VideoTags] Where [Vid] = @vid and [Text] = @text;";
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+                command.Parameters.Add(new SQLiteParameter("@text") { DbType = DbType.String, Value = _text });
 
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        tid = reader.GetInt64(0);
+                    }
+                }
+            }
+
+            if (tid == 0)
+            {
+                using (var command = _transaction.Connection.CreateCommand())
+                {
+                    command.Transaction = _transaction;
+                    command.CommandText = @"Insert into [VideoTags] ([Vid], [Text], [Intensity], [Deleted]) Values (@vid, @text, @intensity, @deleted)";
+                    command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+                    command.Parameters.Add(new SQLiteParameter("@text") { DbType = DbType.String, Value = _text });
+                    command.Parameters.Add(new SQLiteParameter("@intensity") { DbType = DbType.String, Value = Intensity.Neutral.ToString() });
+                    command.Parameters.Add(new SQLiteParameter("@deleted") { DbType = DbType.Boolean, Value = 0 });
+
+                    command.ExecuteNonQuery();
+                }
+            }
+            else
+            {
+                using (var command = _transaction.Connection.CreateCommand())
+                {
+                    command.Transaction = _transaction;
+                    command.CommandText = @"Update [VideoTags] Set [Text] = @text, [Intensity] = @intensity, [Deleted] = @deleted Where [Id] = @tid;";
+                    command.Parameters.Add(new SQLiteParameter("@tid") { DbType = DbType.Int64, Value = tid });
+                    command.Parameters.Add(new SQLiteParameter("@text") { DbType = DbType.String, Value = _text });
+                    command.Parameters.Add(new SQLiteParameter("@intensity") { DbType = DbType.String, Value = _intensity.ToString() });
+                    command.Parameters.Add(new SQLiteParameter("@deleted") { DbType = DbType.Boolean, Value = _deleted });
+
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
+        public static void UpsertScreenlist(SQLiteTransaction _transaction, long _vid, BitmapSource _screenlist)
+        {
+            long id = 0;
+            using (var command = _transaction.Connection.CreateCommand())
+            {
+                command.Transaction = _transaction;
+                command.CommandText = @"Select [Id] From [VideoScreenlists] Where [Vid] = @vid;";
+                command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        id = reader.GetInt64(0);
+                    }
+                }
+            }
+
+            if (id == 0)
+            {
+                using (var command = _transaction.Connection.CreateCommand())
+                {
+                    command.Transaction = _transaction;
+                    command.CommandText = @"Insert into [VideoScreenlists] ([Vid], [Screenlist], [Deleted]) Values (@vid, @screenlist, @deleted)";
+                    command.Parameters.Add(new SQLiteParameter("@vid") { DbType = DbType.Int64, Value = _vid });
+                    command.Parameters.Add(new SQLiteParameter("@screenlist") { DbType = DbType.Binary, Value = _screenlist.GetByteArray() });
+                    command.Parameters.Add(new SQLiteParameter("@deleted") { DbType = DbType.Boolean, Value = 0 });
+
+                    command.ExecuteNonQuery();
+                }
+            }
+            else
+            {
+                using (var command = _transaction.Connection.CreateCommand())
+                {
+                    command.Transaction = _transaction;
+                    command.CommandText = @"Update [VideoScreenlists] Set [Screenlist] = @screenlist Where [Id] = @id;";
+                    command.Parameters.Add(new SQLiteParameter("@id") { DbType = DbType.Int64, Value = id });
+                    command.Parameters.Add(new SQLiteParameter("@screenlist") { DbType = DbType.Binary, Value = _screenlist.GetByteArray() });
+
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
         #endregion
-
-
     }
 }
