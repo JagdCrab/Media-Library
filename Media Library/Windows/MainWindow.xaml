@@ -195,9 +195,13 @@
                         </Grid>
                     </TabItem.Header>
                     <TabItem.Content>
-                        <Border>
-
-                        </Border>
+                        <Grid DataContext="{Binding IwaraTabViewModel}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                        </Grid>
                     </TabItem.Content>
                 </TabItem>
                 <TabItem>

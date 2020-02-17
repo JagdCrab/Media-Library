@@ -98,10 +98,14 @@
     <Compile Include="Components\Observable.cs" />
     <Compile Include="Components\RadialProgressBar.cs" />
     <Compile Include="Components\ValueConverters.cs" />
+    <Compile Include="Data\Accesser.cs" />
+    <Compile Include="Data\ClipAccesser.cs" />
+    <Compile Include="Data\ClipDataModel.cs" />
     <Compile Include="Data\FileSystemAccesser.cs" />
     <Compile Include="Data\MediaAccessor.cs" />
     <Compile Include="ViewModel\CropWindowViewModel.cs" />
     <Compile Include="ViewModel\EntitiesViewModel.cs" />
+    <Compile Include="ViewModel\IwaraViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\ScreenshotWindowViewModel.cs" />
     <Compile Include="ViewModel\SeriesDetailsWindowViewModel.cs" />

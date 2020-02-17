@@ -19,8 +19,7 @@ namespace Media_Library.ViewModel
 {
     class VideoDetailsPageViewModel
     {
-        private long vid { get; set; }
-        private SQLiteTransaction transaction { get; set; }
+        private string vid { get; set; }
 
         public Observable<bool> EditMode { get; }
         public Observable<Visibility> AliasError { get; }
@@ -80,7 +79,7 @@ namespace Media_Library.ViewModel
 
         public VideoDetailsPageViewModel(VideoRecord _record) : this()
         {
-            vid = Convert.ToInt64(_record.Vid);
+            vid = _record.Vid;
 
             Icon.Value = _record.Icon;
 
@@ -111,13 +110,13 @@ namespace Media_Library.ViewModel
 
             Screenlist.Value = _record.Screenlist.Screenlist;
 
-            Icon.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIcon(transaction, vid, Icon.Value); };
+            Icon.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIcon(vid, Icon.Value); };
 
             Playlist.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { throw new NotImplementedException(); };
-            Favorite.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateFavorite(transaction, vid, Favorite.Value); };
+            Favorite.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateFavorite(vid, Favorite.Value); };
 
-            ScoreUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateScore(transaction, vid, ScoreUI.Score.Value); };
-            IntensityUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIntensity(transaction, vid, IntensityUI.Intensity.Value); };
+            ScoreUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateScore(vid, ScoreUI.Score.Value); };
+            IntensityUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIntensity(vid, IntensityUI.Intensity.Value); };
 
             VideoTags.Entities.ListChanged += (object o, ListChangedEventArgs e) => {
                 if (e.ListChangedType == ListChangedType.ItemChanged)
@@ -125,50 +124,60 @@ namespace Media_Library.ViewModel
                     var collection = (BindingList<TagEntityBase>)o;
                     var tag = (TagEntity)collection[e.NewIndex];
 
-                    VideoAccesser.UpsertTag(transaction, vid, tag.Text, tag.Intensity, tag.Deleted);
+                    VideoAccesser.UpsertTag(vid, tag.Text, tag.Intensity, tag.Deleted);
                 }
             };
             
-            Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAlias(transaction, vid, Alias.Value); };
-            Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateSeries(transaction, vid, Series.Value); };
-            Alt_Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltAlias(transaction, vid, Alt_Alias.Value); };
-            Alt_Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltSeries(transaction, vid, Alt_Series.Value); };
+            Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAlias(vid, Alias.Value); };
+            Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateSeries(vid, Series.Value); };
+            Alt_Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltAlias(vid, Alt_Alias.Value); };
+            Alt_Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltSeries(vid, Alt_Series.Value); };
 
-            Screenlist.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpsertScreenlist(transaction, vid, Screenlist.Value); };
+            Screenlist.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpsertScreenlist(vid, Screenlist.Value); };
         }
         #endregion
 
         #region New Record Constructor
         public VideoDetailsPageViewModel(string _path) : this()
         {
-            transaction = VideoAccesser.CreateTransaction();
-            vid = VideoAccesser.CreateNewRecord(transaction);
+            vid = Guid.NewGuid().ToString();
+            VideoAccesser.CreateNewRecord(vid);
 
             EditMode.Value = true;
 
             var fileInfo = new FileInfo(_path);
             var mediaInfo = MediaAccessor.GetMetaData(_path);
+
+            VideoAccesser.UpdateScore(vid, -1);
+            VideoAccesser.UpdateFavorite(vid, false);
+            VideoAccesser.UpdateIntensity(vid, "N/A");
             
-            VideoAccesser.UpdateDuration(transaction, vid, mediaInfo.Metadata.Duration);
+            VideoAccesser.UpdateAlias(vid, fileInfo.Name);
+            Alias.Value = fileInfo.Name;
+
+            VideoAccesser.UpdateSeries(vid, fileInfo.DirectoryName);
+            Series.Value = fileInfo.DirectoryName;
+
+            VideoAccesser.UpdateDuration(vid, mediaInfo.Metadata.Duration);
             Duration.Value = mediaInfo.Metadata.Duration.ToString(@"mm\:ss");
             Bitrate.Value = Math.Round(fileInfo.Length / mediaInfo.Metadata.Duration.TotalSeconds).ToString() + "bps";
 
-            VideoAccesser.UpdateResolution(transaction, vid, mediaInfo.Metadata.VideoData.FrameSize);
+            VideoAccesser.UpdateResolution(vid, mediaInfo.Metadata.VideoData.FrameSize);
             Frame.Value = mediaInfo.Metadata.VideoData.FrameSize;
 
-            VideoAccesser.UpdateFormat(transaction, vid, mediaInfo.Metadata.VideoData.Format);
+            VideoAccesser.UpdateFormat(vid, mediaInfo.Metadata.VideoData.Format);
             Format.Value = mediaInfo.Metadata.VideoData.Format;
 
-            VideoAccesser.UpdateFilePath(transaction, vid, fileInfo.FullName);
+            VideoAccesser.UpdateFilePath(vid, fileInfo.FullName);
             FilePath.Value = fileInfo.FullName;
 
-            VideoAccesser.UpdateFileName(transaction, vid, fileInfo.Name);
+            VideoAccesser.UpdateFileName(vid, fileInfo.Name);
             FileName.Value = fileInfo.Name;
 
-            VideoAccesser.UpdateFileExtention(transaction, vid, fileInfo.Extension);
+            VideoAccesser.UpdateFileExtention(vid, fileInfo.Extension);
             Extention.Value = fileInfo.Extension;
 
-            VideoAccesser.UpdateFileSize(transaction, vid, fileInfo.Length);
+            VideoAccesser.UpdateFileSize(vid, fileInfo.Length);
             FileSize.Value = Math.Round(fileInfo.Length / 1048576d, 1).ToString() + "MB";
             
             ScoreUI = new ScoreEntity();
@@ -178,19 +187,28 @@ namespace Media_Library.ViewModel
             LoadingIndicatorVisibility.Value = Visibility.Visible;
 
             Task.Factory.StartNew(new Action(() => {
-                BitmapSource result = MediaAccessor.CreateGridScreenlist(FilePath.Value, LoadingIndicatorCurrent, LoadingIndicatorMax);
+                BitmapSource result = MediaAccessor.CreateGridScreenlist(mediaInfo, LoadingIndicatorCurrent, LoadingIndicatorMax);
 
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { Screenlist.Value = result; }));
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { LoadingIndicatorVisibility.Value = Visibility.Hidden; }));
+                
+                var crc64 = new Crc64Iso();
+                string hash = string.Empty;
+
+                using (var fs = File.Open(fileInfo.FullName, FileMode.Open))
+                    foreach (var b in crc64.ComputeHash(fs))
+                        hash += b.ToString("x2").ToLower();
+
+                VideoAccesser.UpdateChecksum(vid, hash);
             }));
 
-            Icon.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIcon(transaction, vid, Icon.Value); };
+            Icon.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIcon(vid, Icon.Value); };
 
             Playlist.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { throw new NotImplementedException(); };
-            Favorite.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateFavorite(transaction, vid, Favorite.Value); };
+            Favorite.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateFavorite(vid, Favorite.Value); };
 
-            ScoreUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateScore(transaction, vid, ScoreUI.Score.Value); };
-            IntensityUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIntensity(transaction, vid, IntensityUI.Intensity.Value); };
+            ScoreUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateScore(vid, ScoreUI.Score.Value); };
+            IntensityUI.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateIntensity(vid, IntensityUI.Intensity.Value); };
 
             VideoTags.Entities.ListChanged += (object o, ListChangedEventArgs e) => {
                 if (e.ListChangedType == ListChangedType.ItemChanged)
@@ -198,16 +216,16 @@ namespace Media_Library.ViewModel
                     var collection = (BindingList<TagEntityBase>)o;
                     var tag = (TagEntity)collection[e.NewIndex];
 
-                    VideoAccesser.UpsertTag(transaction, vid, tag.Text, tag.Intensity, tag.Deleted);
+                    VideoAccesser.UpsertTag(vid, tag.Text, tag.Intensity, tag.Deleted);
                 }
             };
 
-            Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAlias(transaction, vid, Alias.Value); };
-            Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateSeries(transaction, vid, Series.Value); };
-            Alt_Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltAlias(transaction, vid, Alt_Alias.Value); };
-            Alt_Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltSeries(transaction, vid, Alt_Series.Value); };
+            Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAlias(vid, Alias.Value); };
+            Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateSeries(vid, Series.Value); };
+            Alt_Alias.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltAlias(vid, Alt_Alias.Value); };
+            Alt_Series.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpdateAltSeries(vid, Alt_Series.Value); };
 
-            Screenlist.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpsertScreenlist(transaction, vid, Screenlist.Value); };
+            Screenlist.PropertyChanged += (object sender, PropertyChangedEventArgs e) => { VideoAccesser.UpsertScreenlist(vid, Screenlist.Value); };
         }
         #endregion
 
@@ -262,7 +280,7 @@ namespace Media_Library.ViewModel
                 if (EditMode.Value)
                 {
                     Favorite.Value = !Favorite.Value;
-                    VideoAccesser.UpdateFavorite(transaction, vid, Favorite.Value);
+                    VideoAccesser.UpdateFavorite(vid, Favorite.Value);
                 }
             }));
 
@@ -271,14 +289,14 @@ namespace Media_Library.ViewModel
                 var fileInfo = new FileInfo(FilePath.Value);
                 var mediaInfo = MediaAccessor.GetMetaData(FilePath.Value);
 
-                VideoAccesser.UpdateDuration(transaction, vid, mediaInfo.Metadata.Duration);
+                VideoAccesser.UpdateDuration(vid, mediaInfo.Metadata.Duration);
                 Duration.Value = mediaInfo.Metadata.Duration.ToString(@"mm\:ss");
                 Bitrate.Value = Math.Round(fileInfo.Length / mediaInfo.Metadata.Duration.TotalSeconds).ToString() + "bps";
 
-                VideoAccesser.UpdateResolution(transaction, vid, mediaInfo.Metadata.VideoData.FrameSize);
+                VideoAccesser.UpdateResolution(vid, mediaInfo.Metadata.VideoData.FrameSize);
                 Frame.Value = mediaInfo.Metadata.VideoData.FrameSize;
 
-                VideoAccesser.UpdateFormat(transaction, vid, mediaInfo.Metadata.VideoData.Format);
+                VideoAccesser.UpdateFormat(vid, mediaInfo.Metadata.VideoData.Format);
                 Format.Value = mediaInfo.Metadata.VideoData.Format;
             }));
 
@@ -289,16 +307,16 @@ namespace Media_Library.ViewModel
                 {
                     var fileInfo = new FileInfo(dialog.FileName);
 
-                    VideoAccesser.UpdateFilePath(transaction, vid, fileInfo.FullName);
+                    VideoAccesser.UpdateFilePath(vid, fileInfo.FullName);
                     FilePath.Value = fileInfo.FullName;
 
-                    VideoAccesser.UpdateFileName(transaction, vid, fileInfo.Name);
+                    VideoAccesser.UpdateFileName(vid, fileInfo.Name);
                     FileName.Value = fileInfo.Name;
 
-                    VideoAccesser.UpdateFileExtention(transaction, vid, fileInfo.Extension);
+                    VideoAccesser.UpdateFileExtention(vid, fileInfo.Extension);
                     Extention.Value = fileInfo.Extension;
 
-                    VideoAccesser.UpdateFileSize(transaction, vid, fileInfo.Length);
+                    VideoAccesser.UpdateFileSize(vid, fileInfo.Length);
                     FileSize.Value = Math.Round(fileInfo.Length / 1048576d, 1).ToString() + "MB";
 
                 }
@@ -308,7 +326,8 @@ namespace Media_Library.ViewModel
                 LoadingIndicatorVisibility.Value = Visibility.Visible;
 
                 Task.Factory.StartNew(new Action(() => {
-                    BitmapSource result = MediaAccessor.CreateGridScreenlist(FilePath.Value, LoadingIndicatorCurrent, LoadingIndicatorMax);
+                    var mediaInfo = MediaAccessor.GetMetaData(FilePath.Value);
+                    BitmapSource result = MediaAccessor.CreateGridScreenlist(mediaInfo, LoadingIndicatorCurrent, LoadingIndicatorMax);
 
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { Screenlist.Value = result; }));
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { LoadingIndicatorVisibility.Value = Visibility.Hidden; }));
@@ -322,20 +341,17 @@ namespace Media_Library.ViewModel
             }));
 
             EnableEditMode = new Command(new Action(() => {
-                transaction = VideoAccesser.CreateTransaction();
                 EditMode.Value = true;
             }));
 
             SaveChanges = new Command(new Action(() => {
                 EditMode.Value = false;
-                transaction.Rollback();
-                transaction.Dispose();
+                Accesser.Instance.Commit();
             }));
 
             RevertChanges = new Command(new Action(() => {
                 EditMode.Value = false;
-                transaction.Rollback();
-                transaction.Dispose();
+                Accesser.Instance.Rollback();
             }));
             #endregion
 

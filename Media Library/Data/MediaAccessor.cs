@@ -108,13 +108,12 @@ namespace Media_Library.Data
             return screenlist;
         }
 
-        public static BitmapSource CreateGridScreenlist(string _file, Observable<int> _step, Observable<int> _max)
+        public static BitmapSource CreateGridScreenlist(MediaFile _file, Observable<int> _step, Observable<int> _max)
         {
             int slWidth = 1920;
             int slHeight = 1080;
-
-            MediaFile sourceFile = GetMetaData(_file);
-            string resolution = sourceFile.Metadata.VideoData.FrameSize;
+            
+            string resolution = _file.Metadata.VideoData.FrameSize;
 
             int screenshotWidth = Convert.ToInt32(resolution.Substring(0, resolution.IndexOf('x')));
             int screenshotHeight = Convert.ToInt32(resolution.Substring(resolution.IndexOf('x') + 1));
@@ -133,14 +132,14 @@ namespace Media_Library.Data
 
             using (var engine = new Engine())
             {
-                double screenshotWindow = sourceFile.Metadata.Duration.TotalSeconds / (screenshotsCount + 1);
+                double screenshotWindow = _file.Metadata.Duration.TotalSeconds / (screenshotsCount + 1);
 
                 for (int n = 0; n < screenshotsCount; n++)
                 {
-                    string pathOut = Path.Combine(Path.GetTempPath(), "MediaLib", Path.GetFileNameWithoutExtension(sourceFile.Filename) + "_" + n.ToString() + ".jpg");
+                    string pathOut = Path.Combine(Path.GetTempPath(), "MediaLib", Path.GetFileNameWithoutExtension(_file.Filename) + "_" + n.ToString() + ".jpg");
                     MediaFile screenshotFile = new MediaFile() { Filename = pathOut };
                     ConversionOptions options = new ConversionOptions() { Seek = TimeSpan.FromSeconds(screenshotWindow * (n + 1)) };
-                    engine.GetThumbnail(sourceFile, screenshotFile, options);
+                    engine.GetThumbnail(_file, screenshotFile, options);
                     screenshotLinks.Add(pathOut);
                     currentStep++;
 

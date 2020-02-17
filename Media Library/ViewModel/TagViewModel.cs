@@ -24,11 +24,13 @@ namespace Media_Library.ViewModel
         }
     }
 
-    class TagPresenter
+    public class TagPresenter
     {
         public BindingList<TagEntityBase> Entities { get; }
         public TagTemplateSelector TemplateSelector { get; }
         
+        public List<string> AvailableTags = VideoAccesser.GetVideoTagsAutoComplete();
+
         public class TagTemplateSelector : DataTemplateSelector
         {
             public override DataTemplate SelectTemplate(object item, DependencyObject container)
@@ -54,7 +56,7 @@ namespace Media_Library.ViewModel
             Entities = new BindingList<TagEntityBase>();
             TemplateSelector = new TagTemplateSelector();
             
-            Entities.Add(new AddButtonEntity(Entities));
+            Entities.Add(new AddButtonEntity(this));
         }
     }
 
@@ -134,39 +136,39 @@ namespace Media_Library.ViewModel
         public Command Submit { get; }
         public Command Cancel { get; }
 
-        public NewTagEntity(BindingList<TagEntityBase> _collection)
+        public NewTagEntity(TagPresenter _tagPresenter)
         {
             Text = new Observable<string>();
-            AutoCompleteCollection = VideoAccesser.GetVideoTagsAutoComplete();
+            AutoCompleteCollection = _tagPresenter.AvailableTags;
 
             IsFocused = new Observable<bool>();
 
             TakeFocusByForce = new Command(new Action(() => { IsFocused.Value = true; }));
 
             Submit = new Command(new Action(() => {
-                _collection.Remove(this);
-                var newTag = new TagEntity(Text.Value, _collection);
-                _collection.Insert(_collection.Count - 1, newTag);
+                _tagPresenter.Entities.Remove(this);
+                var newTag = new TagEntity(Text.Value, _tagPresenter.Entities);
+                _tagPresenter.Entities.Insert(_tagPresenter.Entities.Count - 1, newTag);
                 newTag.NotifyPropertyChanged("Added"); //Have to call PropertyChanged after it's added to collection to route event to ListChanged with ItemChanged type
             }));
 
             Cancel = new Command(new Action(() => {
-                _collection.Remove(this);
+                _tagPresenter.Entities.Remove(this);
             }));
         }
     }
 
     public class AddButtonEntity : TagEntityBase
     {
-        public BindingList<TagEntityBase> Collection { get; }
+        public TagPresenter TagPresenter { get; }
 
         public Command AddNewTag { get; }
 
-        public AddButtonEntity(BindingList<TagEntityBase> _collection)
+        public AddButtonEntity(TagPresenter _tagPresenter)
         {
-            Collection = _collection;
+            TagPresenter = _tagPresenter;
             AddNewTag = new Command(new Action(() => {
-                Collection.Insert(Collection.Count - 1, new NewTagEntity(_collection));
+                TagPresenter.Entities.Insert(TagPresenter.Entities.Count - 1, new NewTagEntity(_tagPresenter));
             }));
         }
     }

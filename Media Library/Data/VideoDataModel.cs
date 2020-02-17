@@ -76,12 +76,6 @@ namespace Media_Library.Data
     #region Video Record
     public class VideoRecordCollection : List<VideoRecord>
     {
-
-        new public VideoRecord this[int vid]
-        {
-            get { return this.Where(x => x.Vid == vid).First(); }
-        }
-
         public VideoRecordCollection()
         {
 
@@ -93,7 +87,7 @@ namespace Media_Library.Data
         private VideoScreenlist screenlist;
         private VideoTagCollection tags;
 
-        public int? Vid { get; set; }
+        public string Vid { get; set; }
         public string File_Path { get; set; }
         public string File_Name { get; set; }
         public string File_Extention { get; set; }
@@ -155,7 +149,7 @@ namespace Media_Library.Data
     public class VideoTag
     {
         public int? Id { get; set; }
-        public int? Vid { get; set; }
+        public string Vid { get; set; }
         public string Text { get; set; }
         public Intensity Intensity { get; set; }
         public bool Deleted { get; set; }
@@ -180,7 +174,7 @@ namespace Media_Library.Data
     public class VideoScreenlist
     {
         public int? Id { get; set; }
-        public int? Vid { get; set; }
+        public string Vid { get; set; }
         public BitmapSource Screenlist { get; set; }
         public bool Deleted { get; set; }
 
@@ -208,7 +202,7 @@ namespace Media_Library.Data
     public class VideoPlaylist
     {
         public int? Pid { get; set; }
-        public int Vid { get; set; }
+        public string Vid { get; set; }
         public string Alias { get; set; }
         public string Series { get; set; }
         public DateTime Inserted { get; set; }

@@ -100,6 +100,19 @@ namespace Media_Library.ViewModel
     }
     #endregion
 
+    #region ClipTabEntities
+    class ClipEntity
+    {
+
+    }
+
+    class ClipSearchEntity
+    {
+
+    }
+
+    #endregion
+
     #region Details
 
     class ScoreEntity : INotifyPropertyChanged
