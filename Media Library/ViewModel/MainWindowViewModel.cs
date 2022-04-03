@@ -10,11 +10,13 @@ namespace Media_Library.ViewModel
     {
         public SettingsTabViewModel SettingsViewModel { get; }
         public VideoTabViewModel VideoViewModel { get; }
+        public ClipTabViewModel ClipViewModel { get; }
 
         public MainWindowViewModel()
         {
             SettingsViewModel = new SettingsTabViewModel();
             VideoViewModel = new VideoTabViewModel();
+            ClipViewModel = new ClipTabViewModel();
         }
     }
 }

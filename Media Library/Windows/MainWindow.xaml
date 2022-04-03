@@ -195,12 +195,109 @@
                         </Grid>
                     </TabItem.Header>
                     <TabItem.Content>
-                        <Grid DataContext="{Binding IwaraTabViewModel}">
+                        <Grid DataContext="{Binding ClipViewModel}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="30"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="125"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Margin="3" Width="24" Visibility="{Binding ClearButtonVisibility.Value}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush" Value="Gray"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Setter Property="CornerRadius" Value="5"/>
+                                            <Setter Property="Background" Value="LightGray"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="Gray"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Border.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick" Command="{Binding ClearFilters}"/>
+                                    </Border.InputBindings>
+                                    <Polygon Width="10" Height="10" Stretch="Fill" Fill="White">
+                                        <Polygon.Points>
+                                            <Point X="3" Y="5"/>
+                                            <Point X="5" Y="3"/>
+                                            <Point X="10" Y="8"/>
+                                            <Point X="15" Y="3"/>
+                                            <Point X="17" Y="5"/>
+                                            <Point X="12" Y="10"/>
+                                            <Point X="17" Y="15"/>
+                                            <Point X="15" Y="17"/>
+                                            <Point X="10" Y="12"/>
+                                            <Point X="5" Y="17"/>
+                                            <Point X="3" Y="15"/>
+                                            <Point X="8" Y="10"/>
+                                        </Polygon.Points>
+                                    </Polygon>
+                                </Border>
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding FilterEntities}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Margin="3" BorderBrush="Gray" CornerRadius="5" BorderThickness="1" Background="{Binding Background}">
+                                                <TextBlock Margin="3" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Text}" Foreground="White"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <tk:AutoCompleteBox x:Name="ClipTabAutoComplete" Grid.Column="2" Margin="3" FontFamily="Segoe UI" Foreground="Gray" FilterMode="Contains" 
+                                                    ItemsSource="{Binding ClipSearchEntities}"
+                                                    ValueMemberBinding="{Binding Text}"
+                                                    SelectedItem="{Binding SelectedSearchEntity.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding AutoCompleteText.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <tk:AutoCompleteBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Grid.Column="0" FontFamily="Segoe UI" FontWeight="SemiBold" Text="{Binding Text}" Foreground="{Binding FontColor}"/>
+                                        </DataTemplate>
+                                    </tk:AutoCompleteBox.ItemTemplate>
+                                    <tk:AutoCompleteBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding AddFilter}"/>
+                                    </tk:AutoCompleteBox.InputBindings>
+                                </tk:AutoCompleteBox>
+                                <ComboBox Grid.Column="3" Margin="3" ItemsSource="{Binding OrderingOptions}" SelectedItem="{Binding SelectedOrdering.Value}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="SelectionChanged">
+                                            <i:InvokeCommandAction Command="{Binding OrderingChanged}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ComboBox>
+                            </Grid>
+                            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding ClipRecordEntitiesView}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Margin="3" Visibility="{Binding Visible.Value}" BorderThickness="1" BorderBrush="#B2B0B5">
+                                                <Image Width="200" Height="200" Source="{Binding Icon}">
+                                                    <Image.InputBindings>
+                                                        <MouseBinding MouseAction="LeftClick" Command="{Binding GetClipDetails}"/>
+                                                    </Image.InputBindings>
+                                                </Image>
+                                                <!--<TextBlock Width="200" Height="200" Background="White" TextWrapping="Wrap" Text="{Binding Name}"/>-->
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
                         </Grid>
                     </TabItem.Content>
                 </TabItem>

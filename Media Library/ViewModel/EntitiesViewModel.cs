@@ -101,14 +101,83 @@ namespace Media_Library.ViewModel
     #endregion
 
     #region ClipTabEntities
-    class ClipEntity
+    class ClipRecordEntity
     {
+        public ClipRecord ClipRecord;
 
+        public string Name { get { return ClipRecord.Alias; } }
+        public BitmapSource Icon { get { return ClipRecord.Icon; } }
+
+        public SearchEntityCollection SearchEntities;
+        public Observable<Visibility> Visible;
+        public Command GetClipDetails
+        {
+            get
+            {
+                return new Command(new Action(() => {
+                    throw new NotImplementedException();
+                }));
+            }
+        }
+
+        public ClipRecordEntity(ClipRecord _record)
+        {
+            ClipRecord = _record;
+            Visible = new Observable<Visibility>() { Value = Visibility.Visible };
+            SearchEntities = _record.SearchEntities;
+        }
     }
 
-    class ClipSearchEntity
+    class ClipSearchEntity : SearchEntity
     {
+        public Brush FontColor { get; }
+        public Brush Background { get; }
 
+        public ClipSearchEntity(string _text) : base("Other", _text)
+        {
+            switch (Type)
+            {
+                case "Music":
+                    FontColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#db3a34"));
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#e15d58"));
+                    break;
+                case "Author":
+                    FontColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#fca311"));
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#fdc467"));
+                    break;
+                case "Tag":
+                    FontColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#084c61"));
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#618d9a"));
+                    break;
+                default:
+                    FontColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#323031"));
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#7c7b7b"));
+                    break;
+            }
+        }
+
+        public ClipSearchEntity(SearchEntity _searchEntity) : base(_searchEntity.Type, _searchEntity.Text)
+        {
+            switch (Type)
+            {
+                case "Music":
+                    FontColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#db3a34"));
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#e15d58"));
+                    break;
+                case "Author":
+                    FontColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#fca311"));
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#fdc467"));
+                    break;
+                case "Tag":
+                    FontColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#084c61"));
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#618d9a"));
+                    break;
+                default:
+                    FontColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#323031"));
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#7c7b7b"));
+                    break;
+            }
+        }
     }
 
     #endregion

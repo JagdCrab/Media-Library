@@ -18,6 +18,7 @@ namespace Media_Library.Data
     {
         private ClipTagCollection clipTagCollection;
         private ClipScreenlist clipScreenlist;
+        private SearchEntityCollection searchEntities;
 
         public string Cid { get; set; }
         public string File_Path { get; set; }
@@ -63,6 +64,12 @@ namespace Media_Library.Data
             set { clipScreenlist = value; }
         }
 
+        public SearchEntityCollection SearchEntities { get {
+                if (searchEntities == null)
+                    searchEntities = ClipAccesser.GetSearchEntities(this);
+                return searchEntities; 
+            } 
+        }
     }
 
     public class ClipTagCollection : List<ClipTag>
